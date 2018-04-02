@@ -5,9 +5,9 @@ import java.util.Date;
 public class Client {
   public int bic;
   private int bin;
+
   public String clientId;
   public String inn;
-
   public String firstname;
   public String surname;
   public String patronymic;
@@ -18,12 +18,13 @@ public class Client {
   public String factAddress;
   public String regAddress;
 
+  public String numSeriaPassport;
+
+  public String physWorkPlace;
   public String jurName;
   public String jurRegistr;
-  public String numSeriaPassport;
   public String okved;
   public String physCasta;
-  public String physWorkPlace;
   public String workplaceSpouse;
 
   public Date dateIssuePassport;
