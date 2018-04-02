@@ -1,0 +1,3 @@
+rootProject.name = 'credit_prediction'
+
+include 'greetgo.prepare_input_data'
