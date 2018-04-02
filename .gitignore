@@ -8,7 +8,6 @@
 /.gwt
 /.gwt-tmp
 /tomcat
-/war
 /gwt-unitCache
 /*.log
 *.iml

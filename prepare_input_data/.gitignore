@@ -1,5 +1,5 @@
 /.gradle
-/bin
+/bin/
 /.settings
 /.classpath
 /.project
@@ -8,9 +8,9 @@
 /.gwt
 /.gwt-tmp
 /tomcat
-/war
 /gwt-unitCache
 /*.log
 *.iml
 *.ipr
 *.iws
+/out/
