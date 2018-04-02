@@ -1,4 +1,4 @@
 
 dependencies {
-  
+  compile group: 'org.postgresql', name: 'postgresql', version: '9.4-1202-jdbc42'
 }

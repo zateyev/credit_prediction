@@ -13,4 +13,17 @@ public class ContractsResp {
 
   public PlanOper planOper;
 
+  @Override
+  public String toString() {
+    return "ContractsResp{" +
+      "client=" + client +
+      ", collateral=" + collateral +
+      ", collateralAdd='" + collateralAdd + '\'' +
+      ", collateralVal='" + collateralVal + '\'' +
+      ", conPers='" + conPers + '\'' +
+      ", credit=" + credit +
+      ", phone=" + phone +
+      ", planOper=" + planOper +
+      '}';
+  }
 }
