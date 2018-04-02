@@ -4,6 +4,7 @@ import kz.greetgo.credit_prediction.prepare_input_data.db.DbAccess;
 import kz.greetgo.credit_prediction.prepare_input_data.model.contract.Client;
 import kz.greetgo.credit_prediction.prepare_input_data.model.contract.ContractsResp;
 import kz.greetgo.credit_prediction.prepare_input_data.model.contract.Credit;
+import kz.greetgo.credit_prediction.prepare_input_data.model.contract.Phone;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -19,6 +20,7 @@ public class ContractsRespParser implements AutoCloseable {
 
   PreparedStatement clientPS;
   PreparedStatement creditPS;
+  PreparedStatement phonePS;
   private final int maxBatchSize;
   private final Connection connection;
 
@@ -81,6 +83,14 @@ public class ContractsRespParser implements AutoCloseable {
       "  dateEnd  date," +
       "  dateOpen  date" +
       ")");
+    DbAccess.createTable(connection, "create table phone (" +
+      "  no         bigint primary key," +
+      "  clientId   varchar(20)," +
+      "  phoneId  varchar(20)," +
+      "  phoneNumStatus  varchar(50)," +
+      "  phoneNumType    varchar(50)," +
+      "  phoneNumb varchar(50)" +
+      ")");
 
     connection.setAutoCommit(false);
 
@@ -99,10 +109,17 @@ public class ContractsRespParser implements AutoCloseable {
       ") values (" +
       " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
+
+    phonePS = connection.prepareStatement("insert into phone (" +
+      "no, clientId, phoneId, phoneNumStatus, phoneNumType, phoneNumb" +
+      ") values (" +
+      " ?,?,?,?,?,?" +
+      ")");
   }
 
   int clientBatchSize = 0;
   int creditBatchSize = 0;
+  int phoneBatchSize = 0;
 
   private void goContractsResp() throws SQLException {
     if (contractsResp == null) return;
@@ -205,6 +222,10 @@ public class ContractsRespParser implements AutoCloseable {
       creditPS.executeBatch();
       creditBatchSize = 0;
     }
+    if (phoneBatchSize > 0) {
+      phonePS.executeBatch();
+      phoneBatchSize = 0;
+    }
     connection.commit();
     goContractsResp();
   }
@@ -218,7 +239,7 @@ public class ContractsRespParser implements AutoCloseable {
   }
 
   interface CloseBracket {
-    void close();
+    void close() throws SQLException;
   }
 
   final List<CloseBracket> closeBracketList = new ArrayList<>();
@@ -226,7 +247,9 @@ public class ContractsRespParser implements AutoCloseable {
   ContractsResp contractsResp = null;
   Client client = null;
   Credit credit = null;
+  Phone phone = null;
   long clientNo = 1;
+  long phoneNo = 1;
 
   private void readLine(String line, int lineNo) throws SQLException {
     if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.ContractsResp@")) {
@@ -244,7 +267,12 @@ public class ContractsRespParser implements AutoCloseable {
     if (line.trim().startsWith("credit=kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Credit@")) {
       credit = new Credit();
       contractsResp.credit = credit;
-//      closeBracketList.add(() -> credit = null);
+      return;
+    }
+
+    if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Phone@")) {
+      phone = new Phone();
+      closeBracketList.add(this::addPhoneToBatch);
       return;
     }
 
@@ -263,6 +291,28 @@ public class ContractsRespParser implements AutoCloseable {
       if (closeBracketList.size() > 0) closeBracketList.remove(closeBracketList.size() - 1).close();
       return;
     }
+  }
+
+  private void addPhoneToBatch() throws SQLException {
+    if (phone == null) return;
+
+    int ind = 1;
+    phonePS.setLong(ind++, phoneNo++);
+    phonePS.setString(ind++, phone.clientId);
+    phonePS.setString(ind++, phone.phoneId);
+    phonePS.setString(ind++, phone.phoneNumStatus);
+    phonePS.setString(ind++, phone.phoneNumType);
+    phonePS.setString(ind, phone.phoneNumb);
+    phonePS.addBatch();
+    phoneBatchSize++;
+
+    if (maxBatchSize <= phoneBatchSize) {
+      phonePS.executeBatch();
+      connection.commit();
+      phoneBatchSize = 0;
+    }
+
+    phone = null;
   }
 
 
@@ -363,6 +413,9 @@ public class ContractsRespParser implements AutoCloseable {
     }
     if ("clientId".equals(key)) {
       client.clientId = value;
+      if (phone != null) {
+        phone.clientId = value;
+      }
       return;
     }
 
@@ -478,6 +531,25 @@ public class ContractsRespParser implements AutoCloseable {
     }
     if ("valuta".equals(key) && credit != null) {
       credit.valuta = value;
+      return;
+    }
+
+
+    //read phone fields
+    if ("phoneId".equals(key) && phone != null) {
+      phone.phoneId = value;
+      return;
+    }
+    if ("phoneNumStatus".equals(key) && phone != null) {
+      phone.phoneNumStatus = value;
+      return;
+    }
+    if ("phoneNumType".equals(key) && phone != null) {
+      phone.phoneNumType = value;
+      return;
+    }
+    if ("phoneNumb".equals(key) && phone != null) {
+      phone.phoneNumb = value;
       return;
     }
 

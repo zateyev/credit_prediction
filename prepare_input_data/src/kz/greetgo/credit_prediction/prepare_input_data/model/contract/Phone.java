@@ -4,8 +4,8 @@ public class Phone {
 
   public String clientId;
   public String phoneId;
-  public boolean phoneNumStatus;
-  public PhoneType phoneNumType;
+  public String phoneNumStatus;
+  public String phoneNumType;
   public String phoneNumb;
 
 }
