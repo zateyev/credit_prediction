@@ -4,19 +4,12 @@ import kz.greetgo.credit_prediction.prepare_input_data.db.DbAccess;
 import kz.greetgo.credit_prediction.prepare_input_data.model.transaction.AccMove;
 import kz.greetgo.credit_prediction.prepare_input_data.model.transaction.FactOper;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
 
-public class TransactionsRespParser implements AutoCloseable {
-  private final Connection connection;
-  private final int maxBatchSize;
+public class TransactionsRespParser extends ParserAbstract {
 
   private FactOper factOper;
   private PreparedStatement factOperPS;
@@ -28,22 +21,8 @@ public class TransactionsRespParser implements AutoCloseable {
   private int accMoveBatchSize = 0;
   private long accMoveNo = 1;
 
-  final List<CloseBracket> closeBracketList = new ArrayList<>();
-  int year, month, day;
-
-  public void read(Path path) throws Exception {
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile()), "UTF-8"))) {
-      int lineNo = 1;
-      while (true) {
-        String line = br.readLine();
-        if (line == null) break;
-        readLine(line, lineNo++);
-      }
-      finish();
-    }
-  }
-
-  private void readLine(String line, int lineNo) throws SQLException {
+  @Override
+  protected void readLine(String line, int lineNo) throws SQLException {
     if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.FactOper@")) {
       factOper = new FactOper();
       closeBracketList.add(this::addFactOperToBatch);
@@ -73,7 +52,8 @@ public class TransactionsRespParser implements AutoCloseable {
     }
   }
 
-  private void readKeyValue(String key, String value) {
+  @Override
+  protected void readKeyValue(String key, String value) {
     if ("contractId".equals(key) && factOper != null) {
       factOper.contractId = value;
       return;
@@ -228,15 +208,8 @@ public class TransactionsRespParser implements AutoCloseable {
     }
   }
 
-  private Date readDate() {
-    GregorianCalendar cal = new GregorianCalendar();
-    cal.set(Calendar.YEAR, year);
-    cal.set(Calendar.MONTH, month);
-    cal.set(Calendar.DAY_OF_MONTH, day);
-    return cal.getTime();
-  }
-
-  private void finish() throws SQLException {
+  @Override
+  protected void finish() throws SQLException {
     if (factOperBatchSize > 0) {
       factOperPS.executeBatch();
       factOperBatchSize = 0;
@@ -249,9 +222,30 @@ public class TransactionsRespParser implements AutoCloseable {
   }
 
   public TransactionsRespParser(Connection connection, int maxBatchSize) throws SQLException {
-    this.connection = connection;
-    this.maxBatchSize = maxBatchSize;
+    super(connection, maxBatchSize);
 
+    createTables();
+
+    connection.setAutoCommit(false);
+
+    factOperPS = connection.prepareStatement("insert into fact_oper (" +
+      "no, contractId, operDate, overdueCred, overdueCredNT, overduePrc, overduePrcNT, payCred, payCredNT, payPrc, " +
+      " payPrc112, payPrc112NT, payPrcNT, penyCalcBalance, penyCalcBalanceNT, penyPay, penyPayNT, prc112Balance, " +
+      " prc112BalanceNT, valuta" +
+      ") values (" +
+      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
+      ")");
+
+    accMovePS = connection.prepareStatement("insert into acc_move (" +
+      "no, accCorr, accMoveId, accNum, accType, closeBalance, closeBalanceNT, contractId, openBalance, openBalanceNT, " +
+      " operDate, turnCred, turnCredNT, turnDebt, turnDebtNT, valuta" +
+      ") values (" +
+      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
+      ")");
+  }
+
+  @Override
+  protected void createTables() throws SQLException {
     DbAccess.createTable(connection, "create table fact_oper (" +
       "   no bigint primary key," +
       "   contractId varchar(20)," +
@@ -292,23 +286,6 @@ public class TransactionsRespParser implements AutoCloseable {
       "   turnDebt decimal," +
       "   turnDebtNT decimal," +
       "   valuta varchar(20)" +
-      ")");
-
-    connection.setAutoCommit(false);
-
-    factOperPS = connection.prepareStatement("insert into fact_oper (" +
-      "no, contractId, operDate, overdueCred, overdueCredNT, overduePrc, overduePrcNT, payCred, payCredNT, payPrc, " +
-      " payPrc112, payPrc112NT, payPrcNT, penyCalcBalance, penyCalcBalanceNT, penyPay, penyPayNT, prc112Balance, " +
-      " prc112BalanceNT, valuta" +
-      ") values (" +
-      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
-      ")");
-
-    accMovePS = connection.prepareStatement("insert into acc_move (" +
-      "no, accCorr, accMoveId, accNum, accType, closeBalance, closeBalanceNT, contractId, openBalance, openBalanceNT, " +
-      " operDate, turnCred, turnCredNT, turnDebt, turnDebtNT, valuta" +
-      ") values (" +
-      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
   }
 
@@ -378,10 +355,6 @@ public class TransactionsRespParser implements AutoCloseable {
     }
 
     accMove = null;
-  }
-
-  private static java.sql.Date toDate(Date javaDate) {
-    return javaDate == null ? null : new java.sql.Date(javaDate.getTime());
   }
 
   @Override

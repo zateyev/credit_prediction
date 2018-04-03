@@ -3,31 +3,56 @@ package kz.greetgo.credit_prediction.prepare_input_data.parser;
 import kz.greetgo.credit_prediction.prepare_input_data.db.DbAccess;
 import kz.greetgo.credit_prediction.prepare_input_data.model.contract.*;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
 
-public class ContractsRespParser implements AutoCloseable {
+public class ContractsRespParser extends ParserAbstract {
 
   PreparedStatement clientPS;
   PreparedStatement creditPS;
   PreparedStatement phonePS;
   PreparedStatement planOperPS;
-  private final int maxBatchSize;
-  private final Connection connection;
 
   public ContractsRespParser(Connection connection, int maxBatchSize) throws SQLException {
-    this.connection = connection;
+    super(connection, maxBatchSize);
 
-    connection.setAutoCommit(true);
+    createTables();
 
-    this.maxBatchSize = maxBatchSize;
+    connection.setAutoCommit(false);
+
+    clientPS = connection.prepareStatement("insert into client (" +
+      "no, clientId, dateBirth, firstname, surname, patronymic, inn, numSeriaPassport, sex, type, factAddress, regAddress, " +
+      "typePassport, whoIssuePassport" +
+      ") values (" +
+      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
+      ")");
+
+    creditPS = connection.prepareStatement("insert into credit (" +
+      "no, clientId, branch, branchCode, contractManager, contractManagerADUser, credLineId, departCode, departName, " +
+      "dogSumma, dogSummaNT, gracePeriod, groupConvNum, kindCredit, methodCalcPrc, nameGroupClient, numDog, numDogCredLine, " +
+      "podSectorCred, prcRate, prePaymentAcc, product, rateAdminPrc, sectorCred, stupenCred, sumAdminPrc, sumAdminPrcNT, " +
+      "sumCredLine, valuta, dateBegin, dateEnd, dateOpen" + //32
+      ") values (" +
+      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
+      ")");
+
+    phonePS = connection.prepareStatement("insert into phone (" +
+      "no, clientId, phoneId, phoneNumStatus, phoneNumType, phoneNumb" +
+      ") values (" +
+      " ?,?,?,?,?,?" +
+      ")");
+
+    planOperPS = connection.prepareStatement("insert into plan_oper (" +
+      "no, contractId, credSumma, debtCredBalance, dogSumma, monthSumma, prcSumma, valuta, planDate" +
+      ") values (" +
+      " ?,?,?,?,?,?,?,?,?" +
+      ")");
+  }
+
+  @Override
+  protected void createTables() throws SQLException {
     DbAccess.createTable(connection, "create table contract_rest (" +
       "  asd varchar(100)" +
       ")");
@@ -100,36 +125,6 @@ public class ContractsRespParser implements AutoCloseable {
       "  valuta          varchar(20)," +
       "  planDate        date" +
       ")");
-
-    connection.setAutoCommit(false);
-
-    clientPS = connection.prepareStatement("insert into client (" +
-      "no, clientId, dateBirth, firstname, surname, patronymic, inn, numSeriaPassport, sex, type, factAddress, regAddress, " +
-      "typePassport, whoIssuePassport" +
-      ") values (" +
-      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
-      ")");
-
-    creditPS = connection.prepareStatement("insert into credit (" +
-      "no, clientId, branch, branchCode, contractManager, contractManagerADUser, credLineId, departCode, departName, " +
-      "dogSumma, dogSummaNT, gracePeriod, groupConvNum, kindCredit, methodCalcPrc, nameGroupClient, numDog, numDogCredLine, " +
-      "podSectorCred, prcRate, prePaymentAcc, product, rateAdminPrc, sectorCred, stupenCred, sumAdminPrc, sumAdminPrcNT, " +
-      "sumCredLine, valuta, dateBegin, dateEnd, dateOpen" + //32
-      ") values (" +
-      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
-      ")");
-
-    phonePS = connection.prepareStatement("insert into phone (" +
-      "no, clientId, phoneId, phoneNumStatus, phoneNumType, phoneNumb" +
-      ") values (" +
-      " ?,?,?,?,?,?" +
-      ")");
-
-    planOperPS = connection.prepareStatement("insert into plan_oper (" +
-      "no, contractId, credSumma, debtCredBalance, dogSumma, monthSumma, prcSumma, valuta, planDate" +
-      ") values (" +
-      " ?,?,?,?,?,?,?,?,?" +
-      ")");
   }
 
   int clientBatchSize = 0;
@@ -167,25 +162,8 @@ public class ContractsRespParser implements AutoCloseable {
     System.out.println(contractsResp);
   }
 
-  private static java.sql.Date toDate(Date javaDate) {
-    return javaDate == null ? null : new java.sql.Date(javaDate.getTime());
-  }
-
-
-  public void read(Path path) throws Exception {
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile()), "UTF-8"))) {
-      int lineNo = 1;
-      while (true) {
-        String line = br.readLine();
-        if (line == null) break;
-        readLine(line, lineNo++);
-      }
-      finish();
-
-    }
-  }
-
-  private void finish() throws SQLException {
+  @Override
+  protected void finish() throws SQLException {
     if (clientBatchSize > 0) {
       clientPS.executeBatch();
       clientBatchSize = 0;
@@ -215,12 +193,6 @@ public class ContractsRespParser implements AutoCloseable {
     connection.setAutoCommit(true);
   }
 
-//  interface CloseBracket {
-//    void close() throws SQLException;
-//  }
-
-  final List<CloseBracket> closeBracketList = new ArrayList<>();
-
   ContractsResp contractsResp = null;
   Client client = null;
   Credit credit = null;
@@ -230,7 +202,8 @@ public class ContractsRespParser implements AutoCloseable {
   long phoneNo = 1;
   long planOperNo = 1;
 
-  private void readLine(String line, int lineNo) throws SQLException {
+  @Override
+  protected void readLine(String line, int lineNo) throws SQLException {
     if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.ContractsResp@")) {
       goContractsResp();
       contractsResp = new ContractsResp();
@@ -375,17 +348,9 @@ public class ContractsRespParser implements AutoCloseable {
 
 
   boolean inDate = false;
-  int year, month, day;
 
-  private Date readDate() {
-    GregorianCalendar cal = new GregorianCalendar();
-    cal.set(Calendar.YEAR, year);
-    cal.set(Calendar.MONTH, month);
-    cal.set(Calendar.DAY_OF_MONTH, day);
-    return cal.getTime();
-  }
-
-  private void readKeyValue(String key, String value) {
+  @Override
+  protected void readKeyValue(String key, String value) {
 
     if (inDate && "year".equals(key)) {
       year = Integer.parseInt(value);

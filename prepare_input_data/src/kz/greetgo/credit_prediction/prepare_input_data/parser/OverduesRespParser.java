@@ -3,41 +3,22 @@ package kz.greetgo.credit_prediction.prepare_input_data.parser;
 import kz.greetgo.credit_prediction.prepare_input_data.db.DbAccess;
 import kz.greetgo.credit_prediction.prepare_input_data.model.overdue.OverduesResp;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
 
-public class OverduesRespParser implements AutoCloseable {
-
-  private final Connection connection;
-  private final int maxBatchSize;
+public class OverduesRespParser extends ParserAbstract {
 
   private OverduesResp overdue;
   private PreparedStatement overduePS;
   private int overdueBatchSize = 0;
   private long overdueNo = 1;
-  final List<CloseBracket> closeBracketList = new ArrayList<>();
+//  final List<CloseBracket> closeBracketList = new ArrayList<>();
   int year, month, day;
 
-  public void read(Path path) throws Exception {
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile()), "UTF-8"))) {
-      int lineNo = 1;
-      while (true) {
-        String line = br.readLine();
-        if (line == null) break;
-        readLine(line, lineNo++);
-      }
-      finish();
-    }
-  }
-
-  private void readLine(String line, int lineNo) throws SQLException {
+  @Override
+  protected void readLine(String line, int lineNo) throws SQLException {
     if (line.trim().startsWith("overdue=kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Overdue@")) {
       overdue = new OverduesResp();
       closeBracketList.add(this::addOverdueToBatch);
@@ -61,7 +42,8 @@ public class OverduesRespParser implements AutoCloseable {
     }
   }
 
-  private void readKeyValue(String key, String value) {
+  @Override
+  protected void readKeyValue(String key, String value) {
     if ("activeSumma".equals(key) && overdue != null) {
       overdue.activeSumma = new BigDecimal(value);
       return;
@@ -166,15 +148,8 @@ public class OverduesRespParser implements AutoCloseable {
     }
   }
 
-  private Date readDate() {
-    GregorianCalendar cal = new GregorianCalendar();
-    cal.set(Calendar.YEAR, year);
-    cal.set(Calendar.MONTH, month);
-    cal.set(Calendar.DAY_OF_MONTH, day);
-    return cal.getTime();
-  }
-
-  private void finish() throws SQLException {
+  @Override
+  protected void finish() throws SQLException {
     if (overdueBatchSize > 0) {
       overduePS.executeBatch();
       overdueBatchSize = 0;
@@ -183,9 +158,22 @@ public class OverduesRespParser implements AutoCloseable {
   }
 
   public OverduesRespParser(Connection connection, int maxBatchSize) throws SQLException {
-    this.connection = connection;
-    this.maxBatchSize = maxBatchSize;
+    super(connection, maxBatchSize);
+    createTables();
 
+    connection.setAutoCommit(false);
+
+    overduePS = connection.prepareStatement("insert into overdue (" +
+      "no, activeSumma, activeSummaNT, calcPenyDebt, calcPenyDebtNT, commentFromCFT, contractId, credExpert, credManagerADUser," +
+      " credManagerDepCode, dateProlongation, debtAll, debtAllNT, debtOnDate, debtOnDateNT, lastPayDate, overdueDay," +
+      " overduePrcDebt, overduePrcDebtNT, planDebtOnDate, planDebtOnDateNT, planPrcDebt, planPrcDebtNT" +
+      ") values (" +
+      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
+      ")");
+  }
+
+  @Override
+  protected void createTables() throws SQLException {
     DbAccess.createTable(connection, "create table overdue (" +
       "   no bigint primary key," +
       "   activeSumma decimal," +
@@ -210,16 +198,6 @@ public class OverduesRespParser implements AutoCloseable {
       "   planDebtOnDateNT decimal," +
       "   planPrcDebt decimal," +
       "   planPrcDebtNT decimal" +
-      ")");
-
-    connection.setAutoCommit(false);
-
-    overduePS = connection.prepareStatement("insert into overdue (" +
-      "no, activeSumma, activeSummaNT, calcPenyDebt, calcPenyDebtNT, commentFromCFT, contractId, credExpert, credManagerADUser," +
-      " credManagerDepCode, dateProlongation, debtAll, debtAllNT, debtOnDate, debtOnDateNT, lastPayDate, overdueDay," +
-      " overduePrcDebt, overduePrcDebtNT, planDebtOnDate, planDebtOnDateNT, planPrcDebt, planPrcDebtNT" +
-      ") values (" +
-      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
   }
 
@@ -260,10 +238,6 @@ public class OverduesRespParser implements AutoCloseable {
     }
 
     overdue = null;
-  }
-
-  private static java.sql.Date toDate(Date javaDate) {
-    return javaDate == null ? null : new java.sql.Date(javaDate.getTime());
   }
 
   @Override
