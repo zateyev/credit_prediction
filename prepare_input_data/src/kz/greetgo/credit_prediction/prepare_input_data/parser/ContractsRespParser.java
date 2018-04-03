@@ -1,10 +1,7 @@
 package kz.greetgo.credit_prediction.prepare_input_data.parser;
 
 import kz.greetgo.credit_prediction.prepare_input_data.db.DbAccess;
-import kz.greetgo.credit_prediction.prepare_input_data.model.contract.Client;
-import kz.greetgo.credit_prediction.prepare_input_data.model.contract.ContractsResp;
-import kz.greetgo.credit_prediction.prepare_input_data.model.contract.Credit;
-import kz.greetgo.credit_prediction.prepare_input_data.model.contract.Phone;
+import kz.greetgo.credit_prediction.prepare_input_data.model.contract.*;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -21,6 +18,7 @@ public class ContractsRespParser implements AutoCloseable {
   PreparedStatement clientPS;
   PreparedStatement creditPS;
   PreparedStatement phonePS;
+  PreparedStatement planOperPS;
   private final int maxBatchSize;
   private final Connection connection;
 
@@ -84,12 +82,23 @@ public class ContractsRespParser implements AutoCloseable {
       "  dateOpen  date" +
       ")");
     DbAccess.createTable(connection, "create table phone (" +
-      "  no         bigint primary key," +
-      "  clientId   varchar(20)," +
-      "  phoneId  varchar(20)," +
-      "  phoneNumStatus  varchar(50)," +
-      "  phoneNumType    varchar(50)," +
-      "  phoneNumb varchar(50)" +
+      "  no             bigint primary key," +
+      "  clientId       varchar(20)," +
+      "  phoneId        varchar(20)," +
+      "  phoneNumStatus varchar(50)," +
+      "  phoneNumType   varchar(50)," +
+      "  phoneNumb      varchar(50)" +
+      ")");
+    DbAccess.createTable(connection, "create table plan_oper (" +
+      "  no              bigint primary key," +
+      "  contractId      varchar(20)," +
+      "  credSumma       decimal," +
+      "  debtCredBalance decimal," +
+      "  dogSumma        decimal," +
+      "  monthSumma      decimal," +
+      "  prcSumma        decimal," +
+      "  valuta          varchar(20)," +
+      "  planDate        date" +
       ")");
 
     connection.setAutoCommit(false);
@@ -115,11 +124,18 @@ public class ContractsRespParser implements AutoCloseable {
       ") values (" +
       " ?,?,?,?,?,?" +
       ")");
+
+    planOperPS = connection.prepareStatement("insert into plan_oper (" +
+      "no, contractId, credSumma, debtCredBalance, dogSumma, monthSumma, prcSumma, valuta, planDate" +
+      ") values (" +
+      " ?,?,?,?,?,?,?,?,?" +
+      ")");
   }
 
   int clientBatchSize = 0;
   int creditBatchSize = 0;
   int phoneBatchSize = 0;
+  int planOperBatchSize = 0;
 
   private void goContractsResp() throws SQLException {
     if (contractsResp == null) return;
@@ -148,9 +164,124 @@ public class ContractsRespParser implements AutoCloseable {
       clientBatchSize = 0;
     }
 
+    System.out.println(contractsResp);
+  }
+
+  private static java.sql.Date toDate(Date javaDate) {
+    return javaDate == null ? null : new java.sql.Date(javaDate.getTime());
+  }
+
+
+  public void read(Path path) throws Exception {
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile()), "UTF-8"))) {
+      int lineNo = 1;
+      while (true) {
+        String line = br.readLine();
+        if (line == null) break;
+        readLine(line, lineNo++);
+      }
+      finish();
+
+    }
+  }
+
+  private void finish() throws SQLException {
+    if (clientBatchSize > 0) {
+      clientPS.executeBatch();
+      clientBatchSize = 0;
+    }
+    if (creditBatchSize > 0) {
+      creditPS.executeBatch();
+      creditBatchSize = 0;
+    }
+    if (phoneBatchSize > 0) {
+      phonePS.executeBatch();
+      phoneBatchSize = 0;
+    }
+    if (planOperBatchSize > 0) {
+      planOperPS.executeBatch();
+      planOperBatchSize = 0;
+    }
+    connection.commit();
+    goContractsResp();
+  }
+
+  @Override
+  public void close() throws Exception {
+    if (clientPS != null) {
+      clientPS.close();
+      clientPS = null;
+    }
+  }
+
+  interface CloseBracket {
+    void close() throws SQLException;
+  }
+
+  final List<CloseBracket> closeBracketList = new ArrayList<>();
+
+  ContractsResp contractsResp = null;
+  Client client = null;
+  Credit credit = null;
+  Phone phone = null;
+  PlanOper planOper = null;
+  long clientNo = 1;
+  long phoneNo = 1;
+  long planOperNo = 1;
+
+  private void readLine(String line, int lineNo) throws SQLException {
+    if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.ContractsResp@")) {
+      goContractsResp();
+      contractsResp = new ContractsResp();
+      return;
+    }
+
+    if (line.trim().startsWith("client=kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Client@")) {
+      client = new Client();
+      contractsResp.client = client;
+      return;
+    }
+
+    if (line.trim().startsWith("credit=kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Credit@")) {
+      credit = new Credit();
+      closeBracketList.add(this::addCreditToBatch);
+//      contractsResp.credit = credit;
+      return;
+    }
+
+    if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Phone@")) {
+      phone = new Phone();
+      closeBracketList.add(this::addPhoneToBatch);
+      return;
+    }
+
+    if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.PlanOper@")) {
+      planOper = new PlanOper();
+      closeBracketList.add(this::addPlanOperToBatch);
+      return;
+    }
+
+    {
+      int eqIndex = line.indexOf('=');
+      if (eqIndex > -1) {
+        String key = line.substring(0, eqIndex).trim();
+        String value = line.substring(eqIndex + 1).trim();
+        if ("<null>".equals(value)) value = null;
+        readKeyValue(key, value);
+        return;
+      }
+    }
+
+    if ("]".equals(line.trim())) {
+      if (closeBracketList.size() > 0) closeBracketList.remove(closeBracketList.size() - 1).close();
+      return;
+    }
+  }
+
+  private void addCreditToBatch() throws SQLException {
     if (credit == null) return;
 
-    ind = 1;
+    int ind = 1;
     creditPS.setLong(ind++, clientNo++);
     creditPS.setString(ind++, credit.clientId);
     creditPS.setString(ind++, credit.branch);
@@ -192,105 +323,32 @@ public class ContractsRespParser implements AutoCloseable {
       creditBatchSize = 0;
     }
 
-    System.out.println(contractsResp);
+    credit = null;
   }
 
-  private static java.sql.Date toDate(Date javaDate) {
-    return javaDate == null ? null : new java.sql.Date(javaDate.getTime());
-  }
+  private void addPlanOperToBatch() throws SQLException {
+    if (planOper == null) return;
 
+    int ind = 1;
+    planOperPS.setLong(ind++, planOperNo++);
+    planOperPS.setString(ind++, planOper.contractId);
+    planOperPS.setBigDecimal(ind++, planOper.credSumma);
+    planOperPS.setBigDecimal(ind++, planOper.debtCredBalance);
+    planOperPS.setBigDecimal(ind++, planOper.dogSumma);
+    planOperPS.setBigDecimal(ind++, planOper.monthSumma);
+    planOperPS.setBigDecimal(ind++, planOper.prcSumma);
+    planOperPS.setString(ind++, planOper.valuta);
+    planOperPS.setObject(ind, toDate(planOper.planDate));
+    planOperPS.addBatch();
+    planOperBatchSize++;
 
-  public void read(Path path) throws Exception {
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile()), "UTF-8"))) {
-      int lineNo = 1;
-      while (true) {
-        String line = br.readLine();
-        if (line == null) break;
-        readLine(line, lineNo++);
-      }
-      finish();
-
-    }
-  }
-
-  private void finish() throws SQLException {
-    if (clientBatchSize > 0) {
-      clientPS.executeBatch();
-      clientBatchSize = 0;
-    }
-    if (creditBatchSize > 0) {
-      creditPS.executeBatch();
-      creditBatchSize = 0;
-    }
-    if (phoneBatchSize > 0) {
-      phonePS.executeBatch();
-      phoneBatchSize = 0;
-    }
-    connection.commit();
-    goContractsResp();
-  }
-
-  @Override
-  public void close() throws Exception {
-    if (clientPS != null) {
-      clientPS.close();
-      clientPS = null;
-    }
-  }
-
-  interface CloseBracket {
-    void close() throws SQLException;
-  }
-
-  final List<CloseBracket> closeBracketList = new ArrayList<>();
-
-  ContractsResp contractsResp = null;
-  Client client = null;
-  Credit credit = null;
-  Phone phone = null;
-  long clientNo = 1;
-  long phoneNo = 1;
-
-  private void readLine(String line, int lineNo) throws SQLException {
-    if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.ContractsResp@")) {
-      goContractsResp();
-      contractsResp = new ContractsResp();
-      return;
+    if (maxBatchSize <= planOperBatchSize) {
+      planOperPS.executeBatch();
+      connection.commit();
+      planOperBatchSize = 0;
     }
 
-    if (line.trim().startsWith("client=kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Client@")) {
-      client = new Client();
-      contractsResp.client = client;
-      return;
-    }
-
-    if (line.trim().startsWith("credit=kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Credit@")) {
-      credit = new Credit();
-      contractsResp.credit = credit;
-      return;
-    }
-
-    if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Phone@")) {
-      phone = new Phone();
-      closeBracketList.add(this::addPhoneToBatch);
-      return;
-    }
-
-    {
-      int eqIndex = line.indexOf('=');
-      if (eqIndex > -1) {
-        String key = line.substring(0, eqIndex).trim();
-        String value = line.substring(eqIndex + 1).trim();
-        if ("<null>".equals(value)) value = null;
-        readKeyValue(key, value);
-        return;
-      }
-    }
-
-    if ("]".equals(line.trim())) {
-      if (closeBracketList.size() > 0) closeBracketList.remove(closeBracketList.size() - 1).close();
-      return;
-    }
+    planOper = null;
   }
 
   private void addPhoneToBatch() throws SQLException {
@@ -364,6 +422,11 @@ public class ContractsRespParser implements AutoCloseable {
     if ("dateOpen".equals(key)) {
       inDate = true;
       closeBracketList.add(() -> credit.dateOpen = readDate());
+      return;
+    }
+    if ("planDate".equals(key)) {
+      inDate = true;
+      closeBracketList.add(() -> planOper.planDate = readDate());
       return;
     }
 
@@ -550,6 +613,36 @@ public class ContractsRespParser implements AutoCloseable {
     }
     if ("phoneNumb".equals(key) && phone != null) {
       phone.phoneNumb = value;
+      return;
+    }
+
+    //read planOper fields
+    if ("contractId".equals(key) && planOper != null) {
+      planOper.contractId = value;
+      return;
+    }
+    if ("credSumma".equals(key) && planOper != null) {
+      planOper.credSumma = new BigDecimal(value);
+      return;
+    }
+    if ("debtCredBalance".equals(key) && planOper != null) {
+      planOper.debtCredBalance = new BigDecimal(value);
+      return;
+    }
+    if ("dogSumma".equals(key) && planOper != null) {
+      planOper.dogSumma = new BigDecimal(value);
+      return;
+    }
+    if ("monthSumma".equals(key) && planOper != null) {
+      planOper.monthSumma = new BigDecimal(value);
+      return;
+    }
+    if ("prcSumma".equals(key) && planOper != null) {
+      planOper.prcSumma = new BigDecimal(value);
+      return;
+    }
+    if ("valuta".equals(key) && planOper != null) {
+      planOper.valuta = value;
       return;
     }
 
