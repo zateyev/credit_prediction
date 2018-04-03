@@ -1,6 +1,7 @@
 package kz.greetgo.credit_prediction.prepare_input_data.parser;
 
 import kz.greetgo.credit_prediction.prepare_input_data.db.DbAccess;
+import kz.greetgo.credit_prediction.prepare_input_data.model.transaction.AccMove;
 import kz.greetgo.credit_prediction.prepare_input_data.model.transaction.FactOper;
 
 import java.io.BufferedReader;
@@ -21,6 +22,12 @@ public class TransactionsRespParser implements AutoCloseable {
   private PreparedStatement factOperPS;
   private int factOperBatchSize = 0;
   private long factOperNo = 1;
+
+  private AccMove accMove;
+  private PreparedStatement accMovePS;
+  private int accMoveBatchSize = 0;
+  private long accMoveNo = 1;
+
   final List<CloseBracket> closeBracketList = new ArrayList<>();
   int year, month, day;
 
@@ -40,6 +47,12 @@ public class TransactionsRespParser implements AutoCloseable {
     if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.FactOper@")) {
       factOper = new FactOper();
       closeBracketList.add(this::addFactOperToBatch);
+      return;
+    }
+
+    if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.AccMove@")) {
+      accMove = new AccMove();
+      closeBracketList.add(this::addAccMoveToBatch);
       return;
     }
 
@@ -151,6 +164,68 @@ public class TransactionsRespParser implements AutoCloseable {
       closeBracketList.add(() -> factOper.operDate = readDate());
       return;
     }
+
+    // read AccMove
+    if ("accCorr".equals(key) && accMove != null) {
+      accMove.accCorr = value;
+      return;
+    }
+    if ("accMoveId".equals(key) && accMove != null) {
+      accMove.accMoveId = value;
+      return;
+    }
+    if ("accNum".equals(key) && accMove != null) {
+      accMove.accNum = value;
+      return;
+    }
+    if ("accType".equals(key) && accMove != null) {
+      accMove.accType = value;
+      return;
+    }
+    if ("closeBalance".equals(key) && accMove != null) {
+      accMove.closeBalance = new BigDecimal(value);
+      return;
+    }
+    if ("closeBalanceNT".equals(key) && accMove != null) {
+      accMove.closeBalanceNT = new BigDecimal(value);
+      return;
+    }
+    if ("contractId".equals(key) && accMove != null) {
+      accMove.contractId = new BigDecimal(value);
+      return;
+    }
+    if ("openBalance".equals(key) && accMove != null) {
+      accMove.openBalance = new BigDecimal(value);
+      return;
+    }
+    if ("openBalanceNT".equals(key) && accMove != null) {
+      accMove.openBalanceNT = new BigDecimal(value);
+      return;
+    }
+    if ("operDate".equals(key) && accMove != null) {
+      closeBracketList.add(() -> accMove.operDate = readDate());
+      return;
+    }
+    if ("turnCred".equals(key) && accMove != null) {
+      accMove.turnCred = new BigDecimal(value);
+      return;
+    }
+    if ("turnCredNT".equals(key) && accMove != null) {
+      accMove.turnCredNT = new BigDecimal(value);
+      return;
+    }
+    if ("turnDebt".equals(key) && accMove != null) {
+      accMove.turnDebt = new BigDecimal(value);
+      return;
+    }
+    if ("turnDebtNT".equals(key) && accMove != null) {
+      accMove.turnDebtNT = new BigDecimal(value);
+      return;
+    }
+    if ("valuta".equals(key) && accMove != null) {
+      accMove.valuta = value;
+      return;
+    }
   }
 
   private Date readDate() {
@@ -165,6 +240,10 @@ public class TransactionsRespParser implements AutoCloseable {
     if (factOperBatchSize > 0) {
       factOperPS.executeBatch();
       factOperBatchSize = 0;
+    }
+    if (accMoveBatchSize > 0) {
+      accMovePS.executeBatch();
+      accMoveBatchSize = 0;
     }
     connection.commit();
   }
@@ -196,6 +275,25 @@ public class TransactionsRespParser implements AutoCloseable {
       "   valuta varchar(20)" +
       ")");
 
+    DbAccess.createTable(connection, "create table acc_move (" +
+      "   no bigint primary key," +
+      "   accCorr varchar(30)," +
+      "   accMoveId varchar(30)," +
+      "   accNum varchar(30)," +
+      "   accType varchar(30)," +
+      "   closeBalance decimal," +
+      "   closeBalanceNT decimal," +
+      "   contractId decimal," +
+      "   openBalance decimal," +
+      "   openBalanceNT decimal," +
+      "   operDate Date," +
+      "   turnCred decimal," +
+      "   turnCredNT decimal," +
+      "   turnDebt decimal," +
+      "   turnDebtNT decimal," +
+      "   valuta varchar(20)" +
+      ")");
+
     connection.setAutoCommit(false);
 
     factOperPS = connection.prepareStatement("insert into fact_oper (" +
@@ -204,6 +302,13 @@ public class TransactionsRespParser implements AutoCloseable {
       " prc112BalanceNT, valuta" +
       ") values (" +
       " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
+      ")");
+
+    accMovePS = connection.prepareStatement("insert into acc_move (" +
+      "no, accCorr, accMoveId, accNum, accType, closeBalance, closeBalanceNT, contractId, openBalance, openBalanceNT, " +
+      " operDate, turnCred, turnCredNT, turnDebt, turnDebtNT, valuta" +
+      ") values (" +
+      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
   }
 
@@ -243,6 +348,38 @@ public class TransactionsRespParser implements AutoCloseable {
     factOper = null;
   }
 
+  private void addAccMoveToBatch() throws SQLException {
+    if (accMove == null) return;
+
+    int ind = 1;
+    accMovePS.setLong(ind++, accMoveNo++);
+    accMovePS.setString(ind++, accMove.accCorr);
+    accMovePS.setString(ind++, accMove.accMoveId);
+    accMovePS.setString(ind++, accMove.accNum);
+    accMovePS.setString(ind++, accMove.accType);
+    accMovePS.setBigDecimal(ind++, accMove.closeBalance);
+    accMovePS.setBigDecimal(ind++, accMove.closeBalanceNT);
+    accMovePS.setBigDecimal(ind++, accMove.contractId);
+    accMovePS.setBigDecimal(ind++, accMove.openBalance);
+    accMovePS.setBigDecimal(ind++, accMove.openBalanceNT);
+    accMovePS.setObject(ind++, toDate(accMove.operDate));
+    accMovePS.setBigDecimal(ind++, accMove.turnCred);
+    accMovePS.setBigDecimal(ind++, accMove.turnCredNT);
+    accMovePS.setBigDecimal(ind++, accMove.turnDebt);
+    accMovePS.setBigDecimal(ind++, accMove.turnDebtNT);
+    accMovePS.setString(ind, accMove.valuta);
+    accMovePS.addBatch();
+    accMoveBatchSize++;
+
+    if (maxBatchSize <= accMoveBatchSize) {
+      accMovePS.executeBatch();
+      connection.commit();
+      accMoveBatchSize = 0;
+    }
+
+    accMove = null;
+  }
+
   private static java.sql.Date toDate(Date javaDate) {
     return javaDate == null ? null : new java.sql.Date(javaDate.getTime());
   }
@@ -252,6 +389,10 @@ public class TransactionsRespParser implements AutoCloseable {
     if (factOperPS != null) {
       factOperPS.close();
       factOperPS = null;
+    }
+    if (accMovePS != null) {
+      accMovePS.close();
+      accMovePS = null;
     }
     connection.setAutoCommit(true);
   }
