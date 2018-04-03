@@ -28,6 +28,7 @@ public class DbAccess {
     } catch (SQLException e) {
       if ("42P07".equals(e.getSQLState())) return;
       throw e;
+//      throw new RuntimeException(e);
     }
   }
 }

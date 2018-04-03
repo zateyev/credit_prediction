@@ -7,15 +7,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 
-public class ContractsRespParserTest {
+public class OverduesRespParserTest {
   @Test
-  public void testName() throws Exception {
+  public void testRead() throws Exception {
     try (
       Connection connection = DbAccess.createConnection();
-      ContractsRespParser p = new ContractsRespParser(connection, 10_000)
+      OverduesRespParser p = new OverduesRespParser(connection, 10_000)
       ) {
 
-      Path path = Paths.get("/home/zateyev/Gshare/credit_prediction/raw_data/getContracts/05-00-28-2873417081.txt");
+      Path path = Paths.get("/home/zateyev/Gshare/credit_prediction/raw_data/getOverdues/05-34-04-2119601050.txt");
       p.read(path);
 
     }

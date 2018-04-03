@@ -212,11 +212,12 @@ public class ContractsRespParser implements AutoCloseable {
       clientPS.close();
       clientPS = null;
     }
+    connection.setAutoCommit(true);
   }
 
-  interface CloseBracket {
-    void close() throws SQLException;
-  }
+//  interface CloseBracket {
+//    void close() throws SQLException;
+//  }
 
   final List<CloseBracket> closeBracketList = new ArrayList<>();
 
@@ -245,7 +246,6 @@ public class ContractsRespParser implements AutoCloseable {
     if (line.trim().startsWith("credit=kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Credit@")) {
       credit = new Credit();
       closeBracketList.add(this::addCreditToBatch);
-//      contractsResp.credit = credit;
       return;
     }
 
