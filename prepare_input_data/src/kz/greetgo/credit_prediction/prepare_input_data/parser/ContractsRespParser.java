@@ -10,18 +10,21 @@ import java.sql.SQLException;
 
 public class ContractsRespParser extends ParserAbstract {
 
-  ContractsResp contractsResp = null;
-  Client client = null;
-  Credit credit = null;
-  Phone phone = null;
-  PlanOper planOper = null;
-  long clientNo = 1;
-  long creditNo = 1;
-  long phoneNo = 1;
-  long planOperNo = 1;
+  private ContractsResp contractsResp = null;
+  private Client client = null;
+  private Credit credit = null;
+  private Collateral collateral = null;
+  private Phone phone = null;
+  private PlanOper planOper = null;
+  private long clientNo = 1;
+  private long creditNo = 1;
+  private long collateralNo = 1;
+  private long phoneNo = 1;
+  private long planOperNo = 1;
 
   PreparedStatement clientPS;
   PreparedStatement creditPS;
+  PreparedStatement collateralPS;
   PreparedStatement phonePS;
   PreparedStatement planOperPS;
 
@@ -48,6 +51,13 @@ public class ContractsRespParser extends ParserAbstract {
       " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
 
+    collateralPS = connection.prepareStatement("insert into collateral (" +
+      "no, address, collateralId, collateralType, contractId, description, insuranceCompany, mortgagor, " +
+      " percentage, summa, summaNT" +
+      ") values (" +
+      " ?,?,?,?,?,?,?,?,?,?,?" +
+      ")");
+
     phonePS = connection.prepareStatement("insert into phone_tmp (" +
       "no, clientId, phoneId, phoneNumStatus, phoneNumType, phoneNumb" +
       ") values (" +
@@ -63,9 +73,6 @@ public class ContractsRespParser extends ParserAbstract {
 
   @Override
   protected void createTables() throws SQLException {
-//    DbAccess.createTable(connection, "create table contract_rest (" +
-//      "  asd varchar(100)" +
-//      ")");
     DbAccess.createTable(connection, "create table client_tmp (" +
       "  no         bigint primary key," +
       "  status int not null default 0," +
@@ -121,6 +128,20 @@ public class ContractsRespParser extends ParserAbstract {
       "  dateEnd  date," +
       "  dateOpen  date" +
       ")");
+    DbAccess.createTable(connection, "create table collateral (" +
+      "  no             bigint primary key," +
+      "  status int not null default 0," +
+      "  address varchar(300)," +
+      "  collateralId varchar(300)," +
+      "  collateralType varchar(300)," +
+      "  contractId varchar(300)," +
+      "  description varchar(300)," +
+      "  insuranceCompany varchar(300)," +
+      "  mortgagor varchar(300)," +
+      "  percentage decimal," +
+      "  summa decimal," +
+      "  summaNT decimal" +
+      ")");
     DbAccess.createTable(connection, "create table phone_tmp (" +
       "  no             bigint primary key," +
       "  status int not null default 0," +
@@ -145,6 +166,7 @@ public class ContractsRespParser extends ParserAbstract {
 
   int clientBatchSize = 0;
   int creditBatchSize = 0;
+  int collateralBatchSize = 0;
   int phoneBatchSize = 0;
   int planOperBatchSize = 0;
 
@@ -201,6 +223,10 @@ public class ContractsRespParser extends ParserAbstract {
       planOperPS.executeBatch();
       planOperBatchSize = 0;
     }
+    if (collateralBatchSize > 0) {
+      collateralPS.executeBatch();
+      collateralBatchSize = 0;
+    }
     connection.commit();
     goContractsResp();
   }
@@ -210,6 +236,22 @@ public class ContractsRespParser extends ParserAbstract {
     if (clientPS != null) {
       clientPS.close();
       clientPS = null;
+    }
+    if (creditPS != null) {
+      creditPS.close();
+      creditPS = null;
+    }
+    if (collateralPS != null) {
+      collateralPS.close();
+      collateralPS = null;
+    }
+    if (phonePS != null) {
+      phonePS.close();
+      phonePS = null;
+    }
+    if (planOperPS != null) {
+      planOperPS.close();
+      planOperPS = null;
     }
     connection.setAutoCommit(true);
   }
@@ -231,6 +273,12 @@ public class ContractsRespParser extends ParserAbstract {
     if (line.trim().startsWith("credit=kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Credit@")) {
       credit = new Credit();
       closeBracketList.add(this::addCreditToBatch);
+      return;
+    }
+
+    if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Collateral@")) {
+      collateral = new Collateral();
+      closeBracketList.add(this::addCollateralToBatch);
       return;
     }
 
@@ -261,6 +309,33 @@ public class ContractsRespParser extends ParserAbstract {
       if (closeBracketList.size() > 0) closeBracketList.remove(closeBracketList.size() - 1).close();
       return;
     }
+  }
+
+  private void addCollateralToBatch() throws SQLException {
+    if (collateral == null) return;
+
+    int ind = 1;
+    collateralPS.setLong(ind++, collateralNo++);
+    collateralPS.setString(ind++, collateral.address);
+    collateralPS.setString(ind++, collateral.collateralId);
+    collateralPS.setString(ind++, collateral.collateralType);
+    collateralPS.setString(ind++, collateral.contractId);
+    collateralPS.setString(ind++, collateral.description);
+    collateralPS.setString(ind++, collateral.insuranceCompany);
+    collateralPS.setString(ind++, collateral.mortgagor);
+    collateralPS.setBigDecimal(ind++, collateral.percentage);
+    collateralPS.setBigDecimal(ind++, collateral.summa);
+    collateralPS.setBigDecimal(ind, collateral.summaNT);
+    collateralPS.addBatch();
+    collateralBatchSize++;
+
+    if (maxBatchSize <= collateralBatchSize) {
+      collateralPS.executeBatch();
+      connection.commit();
+      collateralBatchSize = 0;
+    }
+
+    collateral = null;
   }
 
   private void addCreditToBatch() throws SQLException {
@@ -586,6 +661,48 @@ public class ContractsRespParser extends ParserAbstract {
     }
     if ("valuta".equals(key) && credit != null) {
       credit.valuta = value;
+      return;
+    }
+
+    //read collateral fields
+    if ("address".equals(key) && collateral != null) {
+      collateral.address = value;
+      return;
+    }
+    if ("collateralId".equals(key) && collateral != null) {
+      collateral.collateralId = value;
+      return;
+    }
+    if ("collateralType".equals(key) && collateral != null) {
+      collateral.collateralType = value;
+      return;
+    }
+    if ("contractId".equals(key) && collateral != null) {
+      collateral.contractId = value;
+      return;
+    }
+    if ("description".equals(key) && collateral != null) {
+      collateral.description = value;
+      return;
+    }
+    if ("insuranceCompany".equals(key) && collateral != null) {
+      collateral.insuranceCompany = value;
+      return;
+    }
+    if ("mortgagor".equals(key) && collateral != null) {
+      collateral.mortgagor = value;
+      return;
+    }
+    if ("percentage".equals(key) && collateral != null) {
+      collateral.percentage = new BigDecimal(value);
+      return;
+    }
+    if ("summa".equals(key) && collateral != null) {
+      collateral.summa = new BigDecimal(value);
+      return;
+    }
+    if ("summaNT".equals(key) && collateral != null) {
+      collateral.summaNT = new BigDecimal(value);
       return;
     }
 
