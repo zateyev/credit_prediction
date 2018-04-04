@@ -1,5 +1,6 @@
 package kz.greetgo.credit_prediction.prepare_input_data.controller;
 
+import kz.greetgo.credit_prediction.prepare_input_data.client_to_json.SelectorAsJson;
 import kz.greetgo.credit_prediction.prepare_input_data.db.DbAccess;
 import kz.greetgo.credit_prediction.prepare_input_data.migration.MigrationWorker;
 import kz.greetgo.credit_prediction.prepare_input_data.parser.ContractsRespParser;
@@ -12,18 +13,27 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MigrationController {
-  public void migrate() throws Exception {
+public class MigrationController implements AutoCloseable {
+
+  Connection connection;
+  int maxBatchSize;
+
+  public MigrationController(Connection connection, int maxBatchSize) {
+    this.connection = connection;
+    this.maxBatchSize = maxBatchSize;
+  }
+
+  public void migrateToTmp() throws Exception {
     String homePath = "/home/zateyev/raw_data/";
     List<String> contractFileDirs = getOverdueFiles(homePath + "getContracts");
     List<String> overdueFileDirs = getOverdueFiles(homePath + "getOverdues");
     List<String> transactionFileDirs = getOverdueFiles(homePath + "getTransactions");
 
-    Connection connection = DbAccess.createConnection();
-    int maxBatchSize = 10_000;
     MigrationWorker migrationWorker;
     try (
       ContractsRespParser contractsRespParser = new ContractsRespParser(connection, maxBatchSize);
@@ -53,11 +63,11 @@ public class MigrationController {
       }
     }
 
-    migrationWorker = new MigrationWorker();
-    migrationWorker.connection = connection;
-    migrationWorker.deleteDuplicateRecords();
-
-    connection.close();
+//    migrationWorker = new MigrationWorker();
+//    migrationWorker.connection = connection;
+//    migrationWorker.deleteDuplicateRecords();
+//
+//    connection.close();
 
   }
 
@@ -75,8 +85,58 @@ public class MigrationController {
   }
 
   public static void main(String[] args) throws Exception {
-    MigrationController mc = new MigrationController();
-    mc.migrate();
+    Connection connection = DbAccess.createConnection();
+    try (
+      SelectorAsJson selectorAsJson = new SelectorAsJson(connection);
+      MigrationController mc = new MigrationController(connection, 10_000)
+      ) {
+
+//      mc.migrateToTmp();
+      mc.deleteDuplicateRecords();
+
+      selectorAsJson.createClientJsonFiles("build/json_files/");
+    }
+  }
+
+  private void deleteDuplicateRecords() throws SQLException {
+    //language=PostgreSQL
+    exec("WITH num_ord AS (\n" +
+      "  SELECT no, row_number() OVER(PARTITION BY client_id ORDER BY no DESC) AS ord \n" +
+      "  FROM client_tmp WHERE status = 0\n" +
+      ")\n" +
+      "\n" +
+      "UPDATE client_tmp tc SET status = 2 FROM num_ord\n" +
+      "WHERE tc.no = num_ord.no AND num_ord.ord > 1");
+    //language=PostgreSQL
+    exec("DELETE FROM client_tmp WHERE status = 2");
+
+    //language=PostgreSQL
+    exec("WITH num_ord AS (\n" +
+      "  SELECT no, row_number() OVER(PARTITION BY contract_id ORDER BY no DESC) AS ord \n" +
+      "  FROM credit_tmp WHERE status = 0\n" +
+      ")\n" +
+      "\n" +
+      "UPDATE credit_tmp tc SET status = 2 FROM num_ord\n" +
+      "WHERE tc.no = num_ord.no AND num_ord.ord > 1");
+    //language=PostgreSQL
+    exec("DELETE FROM credit_tmp WHERE status = 2");
+
+    //language=PostgreSQL
+    exec("WITH num_ord AS (\n" +
+      "  SELECT no, row_number() OVER(PARTITION BY phone_id ORDER BY no DESC) AS ord \n" +
+      "  FROM phone_tmp WHERE status = 0\n" +
+      ")\n" +
+      "\n" +
+      "UPDATE phone_tmp tc SET status = 2 FROM num_ord\n" +
+      "WHERE tc.no = num_ord.no AND num_ord.ord > 1");
+    //language=PostgreSQL
+    exec("DELETE FROM phone_tmp WHERE status = 2");
+  }
+
+  private void exec(String sql) throws SQLException {
+    try (Statement statement = connection.createStatement()) {
+      statement.executeUpdate(sql);
+    }
   }
 
   private List<String> getOverdueFiles(String path) {
@@ -111,5 +171,13 @@ public class MigrationController {
 
   private List<String> getTransactionFiles() {
     return null;
+  }
+
+  @Override
+  public void close() throws Exception {
+    if (connection != null) {
+      connection.close();
+      connection = null;
+    }
   }
 }
