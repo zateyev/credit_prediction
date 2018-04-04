@@ -31,19 +31,19 @@ public class MigrationController {
     OverduesRespParser overduesRespParser = new OverduesRespParser(connection, maxBatchSize);
     TransactionsRespParser transactionsRespParser = new TransactionsRespParser(connection, maxBatchSize);
 
-//    for (String contractFileDir : contractFileDirs) {
-//      Path path = Paths.get(contractFileDir);
-//      FileInputStream fileInputStream = new FileInputStream(path.toFile());
-//      contractsRespParser.read(fileInputStream);
-//      System.out.println("File " + contractFileDir + " parsed");
-//    }
+    for (String contractFileDir : contractFileDirs) {
+      Path path = Paths.get(contractFileDir);
+      FileInputStream fileInputStream = new FileInputStream(path.toFile());
+      contractsRespParser.read(fileInputStream);
+      System.out.println("File " + contractFileDir + " parsed");
+    }
 
-//    for (String overdueFileDir : overdueFileDirs) {
-//      System.out.println("Reading file " + overdueFileDir);
-//      Path path = Paths.get(overdueFileDir);
-//      FileInputStream fileInputStream = new FileInputStream(path.toFile());
-//      overduesRespParser.read(fileInputStream);
-//    }
+    for (String overdueFileDir : overdueFileDirs) {
+      System.out.println("Reading file " + overdueFileDir);
+      Path path = Paths.get(overdueFileDir);
+      FileInputStream fileInputStream = new FileInputStream(path.toFile());
+      overduesRespParser.read(fileInputStream);
+    }
 
     for (String transactionFileDir : transactionFileDirs) {
       Path path = Paths.get(transactionFileDir);

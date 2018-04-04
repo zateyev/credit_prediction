@@ -5,20 +5,13 @@ import java.util.Date;
 
 public class Credit {
 
+  public String contractId;
+  public String clientId;
   public String branch;
   public String branchCode;
-  public String clientId;
-  public String codeGroupClient;
-  public String contractId;
   public String contractManager;
   public String contractManagerADUser;
-  public String contractManagerDepCode;
   public String credLineId;
-
-  public Date dateBegin;
-  public Date dateEnd;
-  public Date dateOpen;
-
   public String departCode;
   public String departName;
   public BigDecimal dogSumma;
@@ -36,9 +29,17 @@ public class Credit {
   public String product;
   public BigDecimal rateAdminPrc;
   public String sectorCred;
+  public String codeGroupClient;
+  public String contractManagerDepCode;
   public int stupenCred;
   public BigDecimal sumAdminPrc;
   public BigDecimal sumAdminPrcNT;
   public BigDecimal sumCredLine;
+
   public String valuta;
+
+  public Date dateBegin;
+  public Date dateEnd;
+
+  public Date dateOpen;
 }

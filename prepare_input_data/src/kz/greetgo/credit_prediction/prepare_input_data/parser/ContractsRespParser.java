@@ -10,6 +10,15 @@ import java.sql.SQLException;
 
 public class ContractsRespParser extends ParserAbstract {
 
+  ContractsResp contractsResp = null;
+  Client client = null;
+  Credit credit = null;
+  Phone phone = null;
+  PlanOper planOper = null;
+  long clientNo = 1;
+  long phoneNo = 1;
+  long planOperNo = 1;
+
   PreparedStatement clientPS;
   PreparedStatement creditPS;
   PreparedStatement phonePS;
@@ -30,12 +39,12 @@ public class ContractsRespParser extends ParserAbstract {
       ")");
 
     creditPS = connection.prepareStatement("insert into credit_tmp (" +
-      "no, clientId, branch, branchCode, contractManager, contractManagerADUser, credLineId, departCode, departName, " +
+      "no, contractId, clientId, branch, branchCode, contractManager, contractManagerADUser, credLineId, departCode, departName, " +
       "dogSumma, dogSummaNT, gracePeriod, groupConvNum, kindCredit, methodCalcPrc, nameGroupClient, numDog, numDogCredLine, " +
-      "podSectorCred, prcRate, prePaymentAcc, product, rateAdminPrc, sectorCred, stupenCred, sumAdminPrc, sumAdminPrcNT, " +
-      "sumCredLine, valuta, dateBegin, dateEnd, dateOpen" + //32
+      "podSectorCred, prcRate, prePaymentAcc, product, rateAdminPrc, sectorCred, codeGroupClient, contractManagerDepCode, stupenCred, " +
+      "sumAdminPrc, sumAdminPrcNT, sumCredLine, valuta, dateBegin, dateEnd, dateOpen" + //35
       ") values (" +
-      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
+      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
 
     phonePS = connection.prepareStatement("insert into phone_tmp (" +
@@ -75,6 +84,7 @@ public class ContractsRespParser extends ParserAbstract {
       ")");
     DbAccess.createTable(connection, "create table credit_tmp (" +
       "  no         bigint primary key," +
+      "  contractId   varchar(20)," +
       "  clientId   varchar(20)," +
       "  branch  varchar(300)," +
       "  branchCode  varchar(300)," +
@@ -98,6 +108,8 @@ public class ContractsRespParser extends ParserAbstract {
       "  product varchar(300)," +
       "  rateAdminPrc decimal," +
       "  sectorCred varchar(300)," +
+      "  codeGroupClient varchar(300)," +
+      "  contractManagerDepCode varchar(300)," +
       "  stupenCred int," +
       "  sumAdminPrc decimal," +
       "  sumAdminPrcNT decimal," +
@@ -199,15 +211,6 @@ public class ContractsRespParser extends ParserAbstract {
     connection.setAutoCommit(true);
   }
 
-  ContractsResp contractsResp = null;
-  Client client = null;
-  Credit credit = null;
-  Phone phone = null;
-  PlanOper planOper = null;
-  long clientNo = 1;
-  long phoneNo = 1;
-  long planOperNo = 1;
-
   @Override
   protected void readLine(String line, int lineNo) throws SQLException {
     if (line.trim().startsWith("kz.greetgo.collect.wsdlclient.gen.callcollectHumo.ContractsResp@")) {
@@ -262,6 +265,7 @@ public class ContractsRespParser extends ParserAbstract {
 
     int ind = 1;
     creditPS.setLong(ind++, clientNo++);
+    creditPS.setString(ind++, credit.contractId);
     creditPS.setString(ind++, credit.clientId);
     creditPS.setString(ind++, credit.branch);
     creditPS.setString(ind++, credit.branchCode);
@@ -285,6 +289,8 @@ public class ContractsRespParser extends ParserAbstract {
     creditPS.setString(ind++, credit.product);
     creditPS.setBigDecimal(ind++, credit.rateAdminPrc);
     creditPS.setString(ind++, credit.sectorCred);
+    creditPS.setString(ind++, credit.codeGroupClient);
+    creditPS.setString(ind++, credit.contractManagerDepCode);
     creditPS.setInt(ind++, credit.stupenCred);
     creditPS.setBigDecimal(ind++, credit.sumAdminPrc);
     creditPS.setBigDecimal(ind++, credit.sumAdminPrcNT);
@@ -449,17 +455,21 @@ public class ContractsRespParser extends ParserAbstract {
       client.clientId = value;
       if (phone != null) {
         phone.clientId = value;
+        return;
       }
-      return;
+      if (credit != null) {
+        credit.clientId = value;
+        return;
+      }
     }
 
 
     // read credit fields
-    if ("branch".equals(key)) {
+    if ("branch".equals(key) && credit != null) {
       credit.branch = value;
       return;
     }
-    if ("branchCode".equals(key)) {
+    if ("branchCode".equals(key) && credit != null) {
       credit.branchCode = value;
       return;
     }
@@ -545,6 +555,14 @@ public class ContractsRespParser extends ParserAbstract {
     }
     if ("sectorCred".equals(key) && credit != null) {
       credit.sectorCred = value;
+      return;
+    }
+    if ("codeGroupClient".equals(key) && credit != null) {
+      credit.codeGroupClient = value;
+      return;
+    }
+    if ("contractManagerDepCode".equals(key) && credit != null) {
+      credit.contractManagerDepCode = value;
       return;
     }
     if ("stupenCred".equals(key) && credit != null) {
