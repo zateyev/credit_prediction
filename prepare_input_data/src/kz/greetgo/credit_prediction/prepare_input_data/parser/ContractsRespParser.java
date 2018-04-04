@@ -22,14 +22,14 @@ public class ContractsRespParser extends ParserAbstract {
 
     connection.setAutoCommit(false);
 
-    clientPS = connection.prepareStatement("insert into client (" +
+    clientPS = connection.prepareStatement("insert into client_tmp (" +
       "no, clientId, dateBirth, firstname, surname, patronymic, inn, numSeriaPassport, sex, type, factAddress, regAddress, " +
       "typePassport, whoIssuePassport" +
       ") values (" +
       " ?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
 
-    creditPS = connection.prepareStatement("insert into credit (" +
+    creditPS = connection.prepareStatement("insert into credit_tmp (" +
       "no, clientId, branch, branchCode, contractManager, contractManagerADUser, credLineId, departCode, departName, " +
       "dogSumma, dogSummaNT, gracePeriod, groupConvNum, kindCredit, methodCalcPrc, nameGroupClient, numDog, numDogCredLine, " +
       "podSectorCred, prcRate, prePaymentAcc, product, rateAdminPrc, sectorCred, stupenCred, sumAdminPrc, sumAdminPrcNT, " +
@@ -38,13 +38,13 @@ public class ContractsRespParser extends ParserAbstract {
       " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
 
-    phonePS = connection.prepareStatement("insert into phone (" +
+    phonePS = connection.prepareStatement("insert into phone_tmp (" +
       "no, clientId, phoneId, phoneNumStatus, phoneNumType, phoneNumb" +
       ") values (" +
       " ?,?,?,?,?,?" +
       ")");
 
-    planOperPS = connection.prepareStatement("insert into plan_oper (" +
+    planOperPS = connection.prepareStatement("insert into plan_oper_tmp (" +
       "no, contractId, credSumma, debtCredBalance, dogSumma, monthSumma, prcSumma, valuta, planDate" +
       ") values (" +
       " ?,?,?,?,?,?,?,?,?" +
@@ -53,11 +53,12 @@ public class ContractsRespParser extends ParserAbstract {
 
   @Override
   protected void createTables() throws SQLException {
-    DbAccess.createTable(connection, "create table contract_rest (" +
-      "  asd varchar(100)" +
-      ")");
-    DbAccess.createTable(connection, "create table client (" +
+//    DbAccess.createTable(connection, "create table contract_rest (" +
+//      "  asd varchar(100)" +
+//      ")");
+    DbAccess.createTable(connection, "create table client_tmp (" +
       "  no         bigint primary key," +
+      "  status int not null default 0," +
       "  clientId   varchar(20)," +
       "  dateBirth  date," +
       "  firstname  varchar(300)," +
@@ -72,23 +73,23 @@ public class ContractsRespParser extends ParserAbstract {
       "  typePassport varchar(30)," +
       "  whoIssuePassport varchar(300)" +
       ")");
-    DbAccess.createTable(connection, "create table credit (" +
+    DbAccess.createTable(connection, "create table credit_tmp (" +
       "  no         bigint primary key," +
       "  clientId   varchar(20)," +
       "  branch  varchar(300)," +
       "  branchCode  varchar(300)," +
       "  contractManager    varchar(300)," +
       "  contractManagerADUser varchar(300)," +
-      "  credLineId varchar(50)," +
-      "  departCode varchar(50)," +
+      "  credLineId varchar(300)," +
+      "  departCode varchar(300)," +
       "  departName varchar(300)," +
       "  dogSumma decimal," +
       "  dogSummaNT decimal," +
       "  gracePeriod int," +
-      "  groupConvNum varchar(30)," +
-      "  kindCredit varchar(50)," +
-      "  methodCalcPrc varchar(50)," +
-      "  nameGroupClient varchar(50)," +
+      "  groupConvNum varchar(300)," +
+      "  kindCredit varchar(300)," +
+      "  methodCalcPrc varchar(300)," +
+      "  nameGroupClient varchar(300)," +
       "  numDog varchar(50)," +
       "  numDogCredLine varchar(50)," +
       "  podSectorCred varchar(300)," +
@@ -106,7 +107,7 @@ public class ContractsRespParser extends ParserAbstract {
       "  dateEnd  date," +
       "  dateOpen  date" +
       ")");
-    DbAccess.createTable(connection, "create table phone (" +
+    DbAccess.createTable(connection, "create table phone_tmp (" +
       "  no             bigint primary key," +
       "  clientId       varchar(20)," +
       "  phoneId        varchar(20)," +
@@ -114,7 +115,7 @@ public class ContractsRespParser extends ParserAbstract {
       "  phoneNumType   varchar(50)," +
       "  phoneNumb      varchar(50)" +
       ")");
-    DbAccess.createTable(connection, "create table plan_oper (" +
+    DbAccess.createTable(connection, "create table plan_oper_tmp (" +
       "  no              bigint primary key," +
       "  contractId      varchar(20)," +
       "  credSumma       decimal," +
@@ -159,7 +160,7 @@ public class ContractsRespParser extends ParserAbstract {
       clientBatchSize = 0;
     }
 
-    System.out.println(contractsResp);
+//    System.out.println(contractsResp);
   }
 
   @Override
@@ -169,7 +170,12 @@ public class ContractsRespParser extends ParserAbstract {
       clientBatchSize = 0;
     }
     if (creditBatchSize > 0) {
-      creditPS.executeBatch();
+      try {
+
+        creditPS.executeBatch();
+      }catch (SQLException e) {
+        throw new RuntimeException(e.getNextException());
+      }
       creditBatchSize = 0;
     }
     if (phoneBatchSize > 0) {

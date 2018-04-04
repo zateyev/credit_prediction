@@ -8,16 +8,20 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class TransactionsRespParser extends ParserAbstract {
 
   private FactOper factOper;
   private PreparedStatement factOperPS;
+  private GregorianCalendar operDateCalF;
   private int factOperBatchSize = 0;
-  private long factOperNo = 1;
 
+  private long factOperNo = 1;
   private AccMove accMove;
   private PreparedStatement accMovePS;
+  private GregorianCalendar operDateCal;
   private int accMoveBatchSize = 0;
   private long accMoveNo = 1;
 
@@ -33,6 +37,25 @@ public class TransactionsRespParser extends ParserAbstract {
       accMove = new AccMove();
       closeBracketList.add(this::addAccMoveToBatch);
       return;
+    }
+
+    if (line.trim().startsWith("operDate=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
+      if (factOper != null) {
+        operDateCalF = new GregorianCalendar();
+        closeBracketList.add(() -> {
+          factOper.operDate = operDateCalF.getTime();
+          operDateCalF = null;
+        });
+        return;
+      }
+      if (accMove != null) {
+        operDateCal = new GregorianCalendar();
+        closeBracketList.add(() -> {
+          accMove.operDate = operDateCal.getTime();
+          operDateCal = null;
+        });
+        return;
+      }
     }
 
     {
@@ -129,16 +152,43 @@ public class TransactionsRespParser extends ParserAbstract {
     }
 
     if ("year".equals(key)) {
-      year = Integer.parseInt(value);
-      return;
+      int year = Integer.parseInt(value);
+      if (operDateCal != null) {
+        operDateCal.set(Calendar.YEAR, year);
+        return;
+      }
+      if (operDateCalF != null) {
+        operDateCalF.set(Calendar.YEAR, year);
+        return;
+      }
+//      year = Integer.parseInt(value);
+//      return;
     }
     if ("month".equals(key)) {
-      month = Integer.parseInt(value);
-      return;
+      int month = Integer.parseInt(value);
+      if (operDateCal != null) {
+        operDateCal.set(Calendar.MONTH, month);
+        return;
+      }
+      if (operDateCalF != null) {
+        operDateCalF.set(Calendar.MONTH, month);
+        return;
+      }
+//      month = Integer.parseInt(value);
+//      return;
     }
     if ("day".equals(key)) {
-      day = Integer.parseInt(value);
-      return;
+      int day = Integer.parseInt(value);
+      if (operDateCal != null) {
+        operDateCal.set(Calendar.DAY_OF_MONTH, day);
+        return;
+      }
+      if (operDateCalF != null) {
+        operDateCalF.set(Calendar.DAY_OF_MONTH, day);
+        return;
+      }
+//      day = Integer.parseInt(value);
+//      return;
     }
     if ("operDate".equals(key) && factOper != null) {
       closeBracketList.add(() -> factOper.operDate = readDate());

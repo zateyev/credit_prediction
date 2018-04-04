@@ -1,9 +1,8 @@
 package kz.greetgo.credit_prediction.prepare_input_data.parser;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -16,16 +15,19 @@ public abstract class ParserAbstract implements AutoCloseable {
   protected int year, month, day;
   protected final List<CloseBracket> closeBracketList = new ArrayList<>();
 
+  protected abstract void readLine(String line, int lineNo) throws SQLException;
+  protected abstract void finish() throws SQLException;
+  protected abstract void readKeyValue(String key, String value);
+  protected abstract void createTables() throws SQLException;
+
   public ParserAbstract(Connection connection, int maxBatchSize) throws SQLException {
     this.maxBatchSize = maxBatchSize;
     this.connection = connection;
     createTables();
   }
 
-  protected abstract void createTables() throws SQLException;
-
-  public void read(Path path) throws Exception {
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile()), "UTF-8"))) {
+  public void read(InputStream inputStream) throws Exception {
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
       int lineNo = 1;
       while (true) {
         String line = br.readLine();
@@ -36,10 +38,6 @@ public abstract class ParserAbstract implements AutoCloseable {
 
     }
   }
-
-  protected abstract void readLine(String line, int lineNo) throws SQLException;
-  protected abstract void finish() throws SQLException;
-  protected abstract void readKeyValue(String key, String value);
 
   protected Date readDate() {
     GregorianCalendar cal = new GregorianCalendar();

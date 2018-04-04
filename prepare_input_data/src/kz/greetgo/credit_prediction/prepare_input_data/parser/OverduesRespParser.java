@@ -7,21 +7,45 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class OverduesRespParser extends ParserAbstract {
 
   private OverduesResp overdue;
+  private GregorianCalendar lastPayDateCal;
+  private GregorianCalendar dateProlongationCal;
   private PreparedStatement overduePS;
   private int overdueBatchSize = 0;
   private long overdueNo = 1;
 //  final List<CloseBracket> closeBracketList = new ArrayList<>();
-  int year, month, day;
+//  int year, month, day;
 
   @Override
   protected void readLine(String line, int lineNo) throws SQLException {
     if (line.trim().startsWith("overdue=kz.greetgo.collect.wsdlclient.gen.callcollectHumo.Overdue@")) {
       overdue = new OverduesResp();
       closeBracketList.add(this::addOverdueToBatch);
+      return;
+    }
+
+    if (line.trim().startsWith("lastPayDate=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
+      lastPayDateCal = new GregorianCalendar();
+      closeBracketList.add(() -> {
+        if (lastPayDateCal == null) return;
+        overdue.lastPayDate = lastPayDateCal.getTime();
+        lastPayDateCal = null;
+      });
+      return;
+    }
+
+    if (line.trim().startsWith("dateProlongation=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
+      dateProlongationCal = new GregorianCalendar();
+      closeBracketList.add(() -> {
+        if (dateProlongationCal == null) return;
+        overdue.dateProlongation = dateProlongationCal.getTime();
+        dateProlongationCal = null;
+      });
       return;
     }
 
@@ -80,10 +104,6 @@ public class OverduesRespParser extends ParserAbstract {
       overdue.credManagerDepCode = value;
       return;
     }
-    if ("dateProlongation".equals(key) && overdue != null) {
-      overdue.dateProlongation = value;
-      return;
-    }
     if ("debtAll".equals(key) && overdue != null) {
       overdue.debtAll = new BigDecimal(value);
       return;
@@ -131,21 +151,51 @@ public class OverduesRespParser extends ParserAbstract {
     }
 
     if ("year".equals(key)) {
-      year = Integer.parseInt(value);
-      return;
+      int year = Integer.parseInt(value);
+      if (lastPayDateCal != null) {
+        lastPayDateCal.set(Calendar.YEAR, year);
+        return;
+      }
+      if (dateProlongationCal != null) {
+        dateProlongationCal.set(Calendar.YEAR, year);
+        return;
+      }
+//      year = Integer.parseInt(value);
     }
     if ("month".equals(key)) {
-      month = Integer.parseInt(value);
-      return;
+      int month = Integer.parseInt(value);
+      if (lastPayDateCal != null) {
+        lastPayDateCal.set(Calendar.MONTH, month);
+        return;
+      }
+      if (dateProlongationCal != null) {
+        dateProlongationCal.set(Calendar.MONTH, month);
+        return;
+      }
+//      month = Integer.parseInt(value);
+//      return;
     }
     if ("day".equals(key)) {
-      day = Integer.parseInt(value);
-      return;
+      int day = Integer.parseInt(value);
+      if (lastPayDateCal != null) {
+        lastPayDateCal.set(Calendar.DAY_OF_MONTH, day);
+        return;
+      }
+      if (dateProlongationCal != null) {
+        dateProlongationCal.set(Calendar.DAY_OF_MONTH, day);
+        return;
+      }
+//      day = Integer.parseInt(value);
+//      return;
     }
-    if ("lastPayDate".equals(key)) {
-      closeBracketList.add(() -> overdue.lastPayDate = readDate());
-      return;
-    }
+//    if ("lastPayDate".equals(key)) {
+//      closeBracketList.add(() -> overdue.lastPayDate = readDate());
+//      return;
+//    }
+//    if ("dateProlongation".equals(key)) {
+//      closeBracketList.add(() -> overdue.dateProlongation = readDate());
+//      return;
+//    }
   }
 
   @Override
@@ -185,7 +235,7 @@ public class OverduesRespParser extends ParserAbstract {
       "   credExpert varchar(300)," +
       "   credManagerADUser varchar(30)," +
       "   credManagerDepCode varchar(30)," +
-      "   dateProlongation varchar(30)," +
+      "   dateProlongation date," +
       "   debtAll decimal," +
       "   debtAllNT decimal," +
       "   debtOnDate decimal," +
@@ -215,7 +265,7 @@ public class OverduesRespParser extends ParserAbstract {
     overduePS.setString(ind++, overdue.credExpert);
     overduePS.setString(ind++, overdue.credManagerADUser);
     overduePS.setString(ind++, overdue.credManagerDepCode);
-    overduePS.setString(ind++, overdue.dateProlongation);
+    overduePS.setObject(ind++, toDate(overdue.dateProlongation));
     overduePS.setBigDecimal(ind++, overdue.debtAll);
     overduePS.setBigDecimal(ind++, overdue.debtAllNT);
     overduePS.setBigDecimal(ind++, overdue.debtOnDate);

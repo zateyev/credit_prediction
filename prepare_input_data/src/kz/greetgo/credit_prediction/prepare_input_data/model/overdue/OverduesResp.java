@@ -14,7 +14,7 @@ public class OverduesResp {
   public String credExpert;
   public String credManagerADUser;
   public String credManagerDepCode;
-  public String dateProlongation;
+  public Date dateProlongation;
   public BigDecimal debtAll;
   public BigDecimal debtAllNT;
   public BigDecimal debtOnDate;
