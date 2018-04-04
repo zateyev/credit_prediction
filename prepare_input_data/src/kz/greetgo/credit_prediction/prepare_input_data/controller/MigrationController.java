@@ -2,14 +2,15 @@ package kz.greetgo.credit_prediction.prepare_input_data.controller;
 
 import kz.greetgo.credit_prediction.prepare_input_data.client_to_json.SelectorAsJson;
 import kz.greetgo.credit_prediction.prepare_input_data.db.DbAccess;
-import kz.greetgo.credit_prediction.prepare_input_data.migration.MigrationWorker;
 import kz.greetgo.credit_prediction.prepare_input_data.parser.ContractsRespParser;
 import kz.greetgo.credit_prediction.prepare_input_data.parser.OverduesRespParser;
 import kz.greetgo.credit_prediction.prepare_input_data.parser.TransactionsRespParser;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -34,7 +35,6 @@ public class MigrationController implements AutoCloseable {
     List<String> overdueFileDirs = getOverdueFiles(homePath + "getOverdues");
     List<String> transactionFileDirs = getOverdueFiles(homePath + "getTransactions");
 
-    MigrationWorker migrationWorker;
     try (
       ContractsRespParser contractsRespParser = new ContractsRespParser(connection, maxBatchSize);
       OverduesRespParser overduesRespParser = new OverduesRespParser(connection, maxBatchSize);
@@ -62,13 +62,6 @@ public class MigrationController implements AutoCloseable {
         System.out.println("File " + transactionFileDir + " parsed");
       }
     }
-
-//    migrationWorker = new MigrationWorker();
-//    migrationWorker.connection = connection;
-//    migrationWorker.deleteDuplicateRecords();
-//
-//    connection.close();
-
   }
 
   private List<TarArchiveEntry> getContractFiles(String tarDir) throws IOException {
@@ -91,7 +84,7 @@ public class MigrationController implements AutoCloseable {
       MigrationController mc = new MigrationController(connection, 10_000)
       ) {
 
-//      mc.migrateToTmp();
+      mc.migrateToTmp();
       mc.deleteDuplicateRecords();
 
       selectorAsJson.createClientJsonFiles("build/json_files/");
@@ -167,10 +160,6 @@ public class MigrationController implements AutoCloseable {
     }
 
     return ret;
-  }
-
-  private List<String> getTransactionFiles() {
-    return null;
   }
 
   @Override
