@@ -221,7 +221,7 @@ public class TransactionsRespParser extends ParserAbstract {
       return;
     }
     if ("contractId".equals(key) && accMove != null) {
-      accMove.contractId = new BigDecimal(value);
+      accMove.contractId = value;
       return;
     }
     if ("openBalance".equals(key) && accMove != null) {
@@ -327,7 +327,7 @@ public class TransactionsRespParser extends ParserAbstract {
       "   accType varchar(30)," +
       "   closeBalance decimal," +
       "   closeBalanceNT decimal," +
-      "   contractId decimal," +
+      "   contractId varchar(20)," +
       "   openBalance decimal," +
       "   openBalanceNT decimal," +
       "   operDate Date," +
@@ -386,7 +386,7 @@ public class TransactionsRespParser extends ParserAbstract {
     accMovePS.setString(ind++, accMove.accType);
     accMovePS.setBigDecimal(ind++, accMove.closeBalance);
     accMovePS.setBigDecimal(ind++, accMove.closeBalanceNT);
-    accMovePS.setBigDecimal(ind++, accMove.contractId);
+    accMovePS.setString(ind++, accMove.contractId);
     accMovePS.setBigDecimal(ind++, accMove.openBalance);
     accMovePS.setBigDecimal(ind++, accMove.openBalanceNT);
     accMovePS.setObject(ind++, toDate(accMove.operDate));

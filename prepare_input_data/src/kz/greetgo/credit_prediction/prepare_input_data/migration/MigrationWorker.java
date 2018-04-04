@@ -24,7 +24,7 @@ public class MigrationWorker {
 
   private void migrateFromTmp() throws SQLException {
     validateErrors();
-    markDuplicateRecords();
+    deleteDuplicateRecords();
     checkForExistingRecords();
     upsertRecords();
   }
@@ -33,7 +33,7 @@ public class MigrationWorker {
 
   }
 
-  private void markDuplicateRecords() throws SQLException {
+  public void deleteDuplicateRecords() throws SQLException {
     //language=PostgreSQL
     exec("WITH num_ord AS (\n" +
       "  SELECT no, row_number() OVER(PARTITION BY clientid ORDER BY no DESC) AS ord \n" +
@@ -42,6 +42,30 @@ public class MigrationWorker {
       "\n" +
       "UPDATE client_tmp tc SET status = 2 FROM num_ord\n" +
       "WHERE tc.no = num_ord.no AND num_ord.ord > 1");
+    //language=PostgreSQL
+    exec("DELETE FROM client_tmp WHERE status = 2");
+
+    //language=PostgreSQL
+    exec("WITH num_ord AS (\n" +
+      "  SELECT no, row_number() OVER(PARTITION BY contractid ORDER BY no DESC) AS ord \n" +
+      "  FROM credit_tmp WHERE status = 0\n" +
+      ")\n" +
+      "\n" +
+      "UPDATE credit_tmp tc SET status = 2 FROM num_ord\n" +
+      "WHERE tc.no = num_ord.no AND num_ord.ord > 1");
+    //language=PostgreSQL
+    exec("DELETE FROM credit_tmp WHERE status = 2");
+
+    //language=PostgreSQL
+    exec("WITH num_ord AS (\n" +
+      "  SELECT no, row_number() OVER(PARTITION BY phoneid ORDER BY no DESC) AS ord \n" +
+      "  FROM phone_tmp WHERE status = 0\n" +
+      ")\n" +
+      "\n" +
+      "UPDATE phone_tmp tc SET status = 2 FROM num_ord\n" +
+      "WHERE tc.no = num_ord.no AND num_ord.ord > 1");
+    //language=PostgreSQL
+    exec("DELETE FROM phone_tmp WHERE status = 2");
   }
 
   private void exec(String sql) throws SQLException {

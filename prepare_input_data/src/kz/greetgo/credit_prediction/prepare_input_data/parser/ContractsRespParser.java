@@ -16,6 +16,7 @@ public class ContractsRespParser extends ParserAbstract {
   Phone phone = null;
   PlanOper planOper = null;
   long clientNo = 1;
+  long creditNo = 1;
   long phoneNo = 1;
   long planOperNo = 1;
 
@@ -84,6 +85,7 @@ public class ContractsRespParser extends ParserAbstract {
       ")");
     DbAccess.createTable(connection, "create table credit_tmp (" +
       "  no         bigint primary key," +
+      "  status int not null default 0," +
       "  contractId   varchar(20)," +
       "  clientId   varchar(20)," +
       "  branch  varchar(300)," +
@@ -121,6 +123,7 @@ public class ContractsRespParser extends ParserAbstract {
       ")");
     DbAccess.createTable(connection, "create table phone_tmp (" +
       "  no             bigint primary key," +
+      "  status int not null default 0," +
       "  clientId       varchar(20)," +
       "  phoneId        varchar(20)," +
       "  phoneNumStatus varchar(50)," +
@@ -264,7 +267,7 @@ public class ContractsRespParser extends ParserAbstract {
     if (credit == null) return;
 
     int ind = 1;
-    creditPS.setLong(ind++, clientNo++);
+    creditPS.setLong(ind++, creditNo++);
     creditPS.setString(ind++, credit.contractId);
     creditPS.setString(ind++, credit.clientId);
     creditPS.setString(ind++, credit.branch);

@@ -11,7 +11,7 @@ public class AccMove {
   public String accType;
   public BigDecimal closeBalance;
   public BigDecimal closeBalanceNT;
-  public BigDecimal contractId;
+  public String contractId;
   public BigDecimal openBalance;
   public BigDecimal openBalanceNT;
   public Date operDate;
