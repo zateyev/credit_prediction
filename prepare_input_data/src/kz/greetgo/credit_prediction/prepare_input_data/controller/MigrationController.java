@@ -23,17 +23,33 @@ public class MigrationController implements AutoCloseable {
 
   Connection connection;
   int maxBatchSize;
+  private String pathToRawFiles;
 
   public MigrationController(Connection connection, int maxBatchSize) {
     this.connection = connection;
     this.maxBatchSize = maxBatchSize;
   }
 
+  public static void main(String[] args) throws Exception {
+    Connection connection = DbAccess.createConnection();
+    try (
+      SelectorAsJson selectorAsJson = new SelectorAsJson(connection);
+      MigrationController mc = new MigrationController(connection, 10_000)
+    ) {
+
+      mc.pathToRawFiles = "/home/zateyev/raw_data/";
+
+      mc.migrateToTmp();
+      mc.deleteDuplicateRecords();
+
+      selectorAsJson.createClientJsonFiles("build/json_files/");
+    }
+  }
+
   public void migrateToTmp() throws Exception {
-    String homePath = "/home/zateyev/raw_data/";
-    List<String> contractFileDirs = getOverdueFiles(homePath + "getContracts");
-    List<String> overdueFileDirs = getOverdueFiles(homePath + "getOverdues");
-    List<String> transactionFileDirs = getOverdueFiles(homePath + "getTransactions");
+    List<String> contractFileDirs = getOverdueFiles(pathToRawFiles + "getContracts");
+    List<String> overdueFileDirs = getOverdueFiles(pathToRawFiles + "getOverdues");
+    List<String> transactionFileDirs = getOverdueFiles(pathToRawFiles + "getTransactions");
 
     try (
       ContractsRespParser contractsRespParser = new ContractsRespParser(connection, maxBatchSize);
@@ -75,20 +91,6 @@ public class MigrationController implements AutoCloseable {
       }
     }
     return ret;
-  }
-
-  public static void main(String[] args) throws Exception {
-    Connection connection = DbAccess.createConnection();
-    try (
-      SelectorAsJson selectorAsJson = new SelectorAsJson(connection);
-      MigrationController mc = new MigrationController(connection, 10_000)
-      ) {
-
-      mc.migrateToTmp();
-      mc.deleteDuplicateRecords();
-
-      selectorAsJson.createClientJsonFiles("build/json_files/");
-    }
   }
 
   private void deleteDuplicateRecords() throws SQLException {
