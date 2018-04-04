@@ -5,25 +5,25 @@ import java.util.Date;
 
 public class FactOper {
 
-  public String contractId;
-  public Date operDate;
+  public String contract_id;
+  public Date oper_date;
 
-  public BigDecimal overdueCred;
-  public BigDecimal overdueCredNT;
-  public BigDecimal overduePrc;
-  public BigDecimal overduePrcNT;
-  public BigDecimal payCred;
-  public BigDecimal payCredNT;
-  public BigDecimal payPrc;
-  public BigDecimal payPrc112;
-  public BigDecimal payPrc112NT;
-  public BigDecimal payPrcNT;
-  public BigDecimal penyCalcBalance;
-  public BigDecimal penyCalcBalanceNT;
-  public BigDecimal penyPay;
-  public BigDecimal penyPayNT;
-  public BigDecimal prc112Balance;
-  public BigDecimal prc112BalanceNT;
+  public BigDecimal overdue_cred;
+  public BigDecimal overdue_cred_nt;
+  public BigDecimal overdue_prc;
+  public BigDecimal overdue_prc_nt;
+  public BigDecimal pay_cred;
+  public BigDecimal pay_cred_nt;
+  public BigDecimal pay_prc;
+  public BigDecimal pay_prc_112;
+  public BigDecimal pay_prc_112_nt;
+  public BigDecimal pay_prc_nt;
+  public BigDecimal peny_calc_balance;
+  public BigDecimal peny_calc_balance_nt;
+  public BigDecimal peny_pay;
+  public BigDecimal peny_pay_nt;
+  public BigDecimal prc_112_balance;
+  public BigDecimal prc_112_balance_nt;
   public String valuta;
 
 }

@@ -29,21 +29,21 @@ public class OverduesRespParser extends ParserAbstract {
       return;
     }
 
-    if (line.trim().startsWith("lastPayDate=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
+    if (line.trim().startsWith("last_pay_date=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
       lastPayDateCal = new GregorianCalendar();
       closeBracketList.add(() -> {
         if (lastPayDateCal == null) return;
-        overdue.lastPayDate = lastPayDateCal.getTime();
+        overdue.last_pay_date = lastPayDateCal.getTime();
         lastPayDateCal = null;
       });
       return;
     }
 
-    if (line.trim().startsWith("dateProlongation=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
+    if (line.trim().startsWith("date_prolongation=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
       dateProlongationCal = new GregorianCalendar();
       closeBracketList.add(() -> {
         if (dateProlongationCal == null) return;
-        overdue.dateProlongation = dateProlongationCal.getTime();
+        overdue.date_prolongation = dateProlongationCal.getTime();
         dateProlongationCal = null;
       });
       return;
@@ -69,84 +69,84 @@ public class OverduesRespParser extends ParserAbstract {
   @Override
   protected void readKeyValue(String key, String value) {
     if ("activeSumma".equals(key) && overdue != null) {
-      overdue.activeSumma = new BigDecimal(value);
+      overdue.active_summa = new BigDecimal(value);
       return;
     }
     if ("activeSummaNT".equals(key) && overdue != null) {
-      overdue.activeSummaNT = new BigDecimal(value);
+      overdue.active_summa_nt = new BigDecimal(value);
       return;
     }
     if ("calcPenyDebt".equals(key) && overdue != null) {
-      overdue.calcPenyDebt = new BigDecimal(value);
+      overdue.calc_peny_debt = new BigDecimal(value);
       return;
     }
     if ("calcPenyDebtNT".equals(key) && overdue != null) {
-      overdue.calcPenyDebtNT = new BigDecimal(value);
+      overdue.calc_peny_debt_nt = new BigDecimal(value);
       return;
     }
     if ("commentFromCFT".equals(key) && overdue != null) {
-      overdue.commentFromCFT = value;
+      overdue.comment_from_cft = value;
       return;
     }
     if ("contractId".equals(key) && overdue != null) {
-      overdue.contractId = value;
+      overdue.contract_id = value;
       return;
     }
     if ("credExpert".equals(key) && overdue != null) {
-      overdue.credExpert = value;
+      overdue.cred_expert = value;
       return;
     }
     if ("credManagerADUser".equals(key) && overdue != null) {
-      overdue.credManagerADUser = value;
+      overdue.cred_manager_ad_user = value;
       return;
     }
     if ("credManagerDepCode".equals(key) && overdue != null) {
-      overdue.credManagerDepCode = value;
+      overdue.cred_manager_dep_code = value;
       return;
     }
     if ("debtAll".equals(key) && overdue != null) {
-      overdue.debtAll = new BigDecimal(value);
+      overdue.debt_all = new BigDecimal(value);
       return;
     }
     if ("debtAllNT".equals(key) && overdue != null) {
-      overdue.debtAllNT = new BigDecimal(value);
+      overdue.debt_all_nt = new BigDecimal(value);
       return;
     }
     if ("debtOnDate".equals(key) && overdue != null) {
-      overdue.debtOnDate = new BigDecimal(value);
+      overdue.debt_on_date = new BigDecimal(value);
       return;
     }
     if ("debtOnDateNT".equals(key) && overdue != null) {
-      overdue.debtOnDateNT = new BigDecimal(value);
+      overdue.debt_on_date_nt = new BigDecimal(value);
       return;
     }
 
     if ("overdueDay".equals(key) && overdue != null) {
-      overdue.overdueDay = Integer.parseInt(value);
+      overdue.overdue_day = Integer.parseInt(value);
       return;
     }
     if ("overduePrcDebt".equals(key) && overdue != null) {
-      overdue.overduePrcDebt = new BigDecimal(value);
+      overdue.overdue_prc_debt = new BigDecimal(value);
       return;
     }
     if ("overduePrcDebtNT".equals(key) && overdue != null) {
-      overdue.overduePrcDebtNT = new BigDecimal(value);
+      overdue.overdue_prc_debt_nt = new BigDecimal(value);
       return;
     }
     if ("planDebtOnDate".equals(key) && overdue != null) {
-      overdue.planDebtOnDate = new BigDecimal(value);
+      overdue.plan_debt_on_date = new BigDecimal(value);
       return;
     }
     if ("planDebtOnDateNT".equals(key) && overdue != null) {
-      overdue.planDebtOnDateNT = new BigDecimal(value);
+      overdue.plan_debt_on_date_nt = new BigDecimal(value);
       return;
     }
     if ("planPrcDebt".equals(key) && overdue != null) {
-      overdue.planPrcDebt = new BigDecimal(value);
+      overdue.plan_prc_debt = new BigDecimal(value);
       return;
     }
     if ("planPrcDebtNT".equals(key) && overdue != null) {
-      overdue.planPrcDebtNT = new BigDecimal(value);
+      overdue.plan_prc_debt_nt = new BigDecimal(value);
       return;
     }
 
@@ -188,12 +188,12 @@ public class OverduesRespParser extends ParserAbstract {
 //      day = Integer.parseInt(value);
 //      return;
     }
-//    if ("lastPayDate".equals(key)) {
-//      closeBracketList.add(() -> overdue.lastPayDate = readDate());
+//    if ("last_pay_date".equals(key)) {
+//      closeBracketList.add(() -> overdue.last_pay_date = readDate());
 //      return;
 //    }
-//    if ("dateProlongation".equals(key)) {
-//      closeBracketList.add(() -> overdue.dateProlongation = readDate());
+//    if ("date_prolongation".equals(key)) {
+//      closeBracketList.add(() -> overdue.date_prolongation = readDate());
 //      return;
 //    }
   }
@@ -214,9 +214,9 @@ public class OverduesRespParser extends ParserAbstract {
     connection.setAutoCommit(false);
 
     overduePS = connection.prepareStatement("insert into overdue (" +
-      "no, activeSumma, activeSummaNT, calcPenyDebt, calcPenyDebtNT, commentFromCFT, contractId, credExpert, credManagerADUser," +
-      " credManagerDepCode, dateProlongation, debtAll, debtAllNT, debtOnDate, debtOnDateNT, lastPayDate, overdueDay," +
-      " overduePrcDebt, overduePrcDebtNT, planDebtOnDate, planDebtOnDateNT, planPrcDebt, planPrcDebtNT" +
+      "no, active_summa, active_summa_nt, calc_peny_debt, calc_peny_debt_nt, comment_from_cft, contract_id, cred_expert, cred_manager_ad_user," +
+      " cred_manager_dep_code, date_prolongation, debt_all, debt_all_nt, debt_on_date, debt_on_date_nt, last_pay_date, overdue_day," +
+      " overdue_prc_debt, overdue_prc_debt_nt, plan_debt_on_date, plan_debt_on_date_nt, plan_prc_debt, plan_prc_debt_nt" +
       ") values (" +
       " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
@@ -226,28 +226,28 @@ public class OverduesRespParser extends ParserAbstract {
   protected void createTables() throws SQLException {
     DbAccess.createTable(connection, "create table overdue (" +
       "   no bigint primary key," +
-      "   activeSumma decimal," +
-      "   activeSummaNT decimal," +
-      "   calcPenyDebt decimal," +
-      "   calcPenyDebtNT decimal," +
-      "   commentFromCFT varchar(300)," +
-      "   contractId varchar(30)," +
-      "   credExpert varchar(300)," +
-      "   credManagerADUser varchar(30)," +
-      "   credManagerDepCode varchar(30)," +
-      "   dateProlongation date," +
-      "   debtAll decimal," +
-      "   debtAllNT decimal," +
-      "   debtOnDate decimal," +
-      "   debtOnDateNT decimal," +
-      "   lastPayDate date," +
-      "   overdueDay integer," +
-      "   overduePrcDebt decimal," +
-      "   overduePrcDebtNT decimal," +
-      "   planDebtOnDate decimal," +
-      "   planDebtOnDateNT decimal," +
-      "   planPrcDebt decimal," +
-      "   planPrcDebtNT decimal" +
+      "   active_summa decimal," +
+      "   active_summa_nt decimal," +
+      "   calc_peny_debt decimal," +
+      "   calc_peny_debt_nt decimal," +
+      "   comment_from_cft varchar(300)," +
+      "   contract_id varchar(30)," +
+      "   cred_expert varchar(300)," +
+      "   cred_manager_ad_user varchar(30)," +
+      "   cred_manager_dep_code varchar(30)," +
+      "   date_prolongation date," +
+      "   debt_all decimal," +
+      "   debt_all_nt decimal," +
+      "   debt_on_date decimal," +
+      "   debt_on_date_nt decimal," +
+      "   last_pay_date date," +
+      "   overdue_day integer," +
+      "   overdue_prc_debt decimal," +
+      "   overdue_prc_debt_nt decimal," +
+      "   plan_debt_on_date decimal," +
+      "   plan_debt_on_date_nt decimal," +
+      "   plan_prc_debt decimal," +
+      "   plan_prc_debt_nt decimal" +
       ")");
   }
 
@@ -256,28 +256,28 @@ public class OverduesRespParser extends ParserAbstract {
 
     int ind = 1;
     overduePS.setLong(ind++, overdueNo++);
-    overduePS.setBigDecimal(ind++, overdue.activeSumma);
-    overduePS.setBigDecimal(ind++, overdue.activeSummaNT);
-    overduePS.setBigDecimal(ind++, overdue.calcPenyDebt);
-    overduePS.setBigDecimal(ind++, overdue.calcPenyDebtNT);
-    overduePS.setString(ind++, overdue.commentFromCFT);
-    overduePS.setString(ind++, overdue.contractId);
-    overduePS.setString(ind++, overdue.credExpert);
-    overduePS.setString(ind++, overdue.credManagerADUser);
-    overduePS.setString(ind++, overdue.credManagerDepCode);
-    overduePS.setObject(ind++, toDate(overdue.dateProlongation));
-    overduePS.setBigDecimal(ind++, overdue.debtAll);
-    overduePS.setBigDecimal(ind++, overdue.debtAllNT);
-    overduePS.setBigDecimal(ind++, overdue.debtOnDate);
-    overduePS.setBigDecimal(ind++, overdue.debtOnDateNT);
-    overduePS.setObject(ind++, toDate(overdue.lastPayDate));
-    overduePS.setInt(ind++, overdue.overdueDay);
-    overduePS.setBigDecimal(ind++, overdue.overduePrcDebt);
-    overduePS.setBigDecimal(ind++, overdue.overduePrcDebtNT);
-    overduePS.setBigDecimal(ind++, overdue.planDebtOnDate);
-    overduePS.setBigDecimal(ind++, overdue.planDebtOnDateNT);
-    overduePS.setBigDecimal(ind++, overdue.planPrcDebt);
-    overduePS.setBigDecimal(ind, overdue.planPrcDebtNT);
+    overduePS.setBigDecimal(ind++, overdue.active_summa);
+    overduePS.setBigDecimal(ind++, overdue.active_summa_nt);
+    overduePS.setBigDecimal(ind++, overdue.calc_peny_debt);
+    overduePS.setBigDecimal(ind++, overdue.calc_peny_debt_nt);
+    overduePS.setString(ind++, overdue.comment_from_cft);
+    overduePS.setString(ind++, overdue.contract_id);
+    overduePS.setString(ind++, overdue.cred_expert);
+    overduePS.setString(ind++, overdue.cred_manager_ad_user);
+    overduePS.setString(ind++, overdue.cred_manager_dep_code);
+    overduePS.setObject(ind++, toDate(overdue.date_prolongation));
+    overduePS.setBigDecimal(ind++, overdue.debt_all);
+    overduePS.setBigDecimal(ind++, overdue.debt_all_nt);
+    overduePS.setBigDecimal(ind++, overdue.debt_on_date);
+    overduePS.setBigDecimal(ind++, overdue.debt_on_date_nt);
+    overduePS.setObject(ind++, toDate(overdue.last_pay_date));
+    overduePS.setInt(ind++, overdue.overdue_day);
+    overduePS.setBigDecimal(ind++, overdue.overdue_prc_debt);
+    overduePS.setBigDecimal(ind++, overdue.overdue_prc_debt_nt);
+    overduePS.setBigDecimal(ind++, overdue.plan_debt_on_date);
+    overduePS.setBigDecimal(ind++, overdue.plan_debt_on_date_nt);
+    overduePS.setBigDecimal(ind++, overdue.plan_prc_debt);
+    overduePS.setBigDecimal(ind, overdue.plan_prc_debt_nt);
     overduePS.addBatch();
     overdueBatchSize++;
 

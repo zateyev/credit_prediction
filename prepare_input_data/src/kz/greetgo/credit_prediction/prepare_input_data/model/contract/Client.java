@@ -6,56 +6,56 @@ public class Client {
   public int bic;
   private int bin;
 
-  public String clientId;
+  public String client_id;
   public String inn;
   public String firstname;
   public String surname;
   public String patronymic;
   public String sex;
-  public Date dateBirth;
+  public Date date_birth;
   public String type;
 
-  public String factAddress;
-  public String regAddress;
+  public String fact_address;
+  public String reg_address;
 
-  public String numSeriaPassport;
+  public String num_seria_passport;
 
-  public String physWorkPlace;
-  public String jurName;
-  public String jurRegistr;
+  public String phys_work_place;
+  public String jur_name;
+  public String jur_registr;
   public String okved;
-  public String physCasta;
-  public String workplaceSpouse;
+  public String phys_casta;
+  public String workplace_spouse;
 
-  public Date dateIssuePassport;
-  public String typePassport;
-  public String whoIssuePassport;
+  public Date date_issue_passport;
+  public String type_passport;
+  public String who_issue_passport;
 
   @Override
   public String toString() {
     return "Client{" +
       "bic=" + bic +
       ", bin=" + bin +
-      ", clientId='" + clientId + '\'' +
+      ", client_id='" + client_id + '\'' +
       ", inn='" + inn + '\'' +
       ", firstname='" + firstname + '\'' +
       ", surname='" + surname + '\'' +
       ", patronymic='" + patronymic + '\'' +
       ", sex='" + sex + '\'' +
-      ", dateBirth=" + dateBirth +
+      ", date_birth=" + date_birth +
       ", type='" + type + '\'' +
-      ", factAddress='" + factAddress + '\'' +
-      ", regAddress='" + regAddress + '\'' +
-      ", jurName='" + jurName + '\'' +
-      ", jurRegistr='" + jurRegistr + '\'' +
-      ", numSeriaPassport='" + numSeriaPassport + '\'' +
+      ", fact_address='" + fact_address + '\'' +
+      ", reg_address='" + reg_address + '\'' +
+      ", jur_name='" + jur_name + '\'' +
+      ", jur_registr='" + jur_registr + '\'' +
+      ", num_seria_passport='" + num_seria_passport + '\'' +
       ", okved='" + okved + '\'' +
-      ", physCasta='" + physCasta + '\'' +
-      ", physWorkPlace='" + physWorkPlace + '\'' +
-      ", workplaceSpouse='" + workplaceSpouse + '\'' +
-      ", dateIssuePassport=" + dateIssuePassport +
-      ", typePassport='" + typePassport + '\'' +
-      ", whoIssuePassport='" + whoIssuePassport + '\'' +
+      ", phys_casta='" + phys_casta + '\'' +
+      ", phys_work_place='" + phys_work_place + '\'' +
+      ", workplace_spouse='" + workplace_spouse + '\'' +
+      ", date_issue_passport=" + date_issue_passport +
+      ", type_passport='" + type_passport + '\'' +
+      ", who_issue_passport='" + who_issue_passport + '\'' +
       '}';
   }
 }

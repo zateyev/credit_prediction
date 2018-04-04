@@ -5,29 +5,29 @@ import java.util.Date;
 
 public class OverduesResp {
 
-  public BigDecimal activeSumma;
-  public BigDecimal activeSummaNT;
-  public BigDecimal calcPenyDebt;
-  public BigDecimal calcPenyDebtNT;
-  public String commentFromCFT;
-  public String contractId;
-  public String credExpert;
-  public String credManagerADUser;
-  public String credManagerDepCode;
-  public Date dateProlongation;
-  public BigDecimal debtAll;
-  public BigDecimal debtAllNT;
-  public BigDecimal debtOnDate;
-  public BigDecimal debtOnDateNT;
+  public BigDecimal active_summa;
+  public BigDecimal active_summa_nt;
+  public BigDecimal calc_peny_debt;
+  public BigDecimal calc_peny_debt_nt;
+  public String comment_from_cft;
+  public String contract_id;
+  public String cred_expert;
+  public String cred_manager_ad_user;
+  public String cred_manager_dep_code;
+  public Date date_prolongation;
+  public BigDecimal debt_all;
+  public BigDecimal debt_all_nt;
+  public BigDecimal debt_on_date;
+  public BigDecimal debt_on_date_nt;
 
-  public Date lastPayDate;
+  public Date last_pay_date;
 
-  public int overdueDay;
-  public BigDecimal overduePrcDebt;
-  public BigDecimal overduePrcDebtNT;
-  public BigDecimal planDebtOnDate;
-  public BigDecimal planDebtOnDateNT;
-  public BigDecimal planPrcDebt;
-  public BigDecimal planPrcDebtNT;
+  public int overdue_day;
+  public BigDecimal overdue_prc_debt;
+  public BigDecimal overdue_prc_debt_nt;
+  public BigDecimal plan_debt_on_date;
+  public BigDecimal plan_debt_on_date_nt;
+  public BigDecimal plan_prc_debt;
+  public BigDecimal plan_prc_debt_nt;
 
 }

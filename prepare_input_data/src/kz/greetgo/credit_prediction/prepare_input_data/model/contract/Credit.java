@@ -5,41 +5,41 @@ import java.util.Date;
 
 public class Credit {
 
-  public String contractId;
-  public String clientId;
+  public String contract_id;
+  public String client_id;
   public String branch;
-  public String branchCode;
-  public String contractManager;
-  public String contractManagerADUser;
-  public String credLineId;
-  public String departCode;
-  public String departName;
-  public BigDecimal dogSumma;
-  public BigDecimal dogSummaNT;
-  public int gracePeriod;
-  public String groupConvNum;
-  public String kindCredit;
-  public String methodCalcPrc;
-  public String nameGroupClient;
-  public String numDog;
-  public String numDogCredLine;
-  public String podSectorCred;
-  public BigDecimal prcRate;
-  public String prePaymentAcc;
+  public String branch_code;
+  public String contract_manager;
+  public String contract_manager_ad_user;
+  public String cred_line_id;
+  public String depart_code;
+  public String depart_name;
+  public BigDecimal dog_summa;
+  public BigDecimal dog_summa_nt;
+  public int grace_period;
+  public String group_conv_num;
+  public String kind_credit;
+  public String method_calc_prc;
+  public String name_group_client;
+  public String num_dog;
+  public String num_dog_cred_line;
+  public String pod_sector_cred;
+  public BigDecimal prc_rate;
+  public String pre_payment_acc;
   public String product;
-  public BigDecimal rateAdminPrc;
-  public String sectorCred;
-  public String codeGroupClient;
-  public String contractManagerDepCode;
-  public int stupenCred;
-  public BigDecimal sumAdminPrc;
-  public BigDecimal sumAdminPrcNT;
-  public BigDecimal sumCredLine;
+  public BigDecimal rate_admin_prc;
+  public String sector_cred;
+  public String code_group_client;
+  public String contract_manager_dep_code;
+  public int stupen_cred;
+  public BigDecimal sum_admin_prc;
+  public BigDecimal sum_admin_prc_nt;
+  public BigDecimal sum_cred_line;
 
   public String valuta;
 
-  public Date dateBegin;
-  public Date dateEnd;
+  public Date date_begin;
+  public Date date_end;
 
-  public Date dateOpen;
+  public Date date_open;
 }

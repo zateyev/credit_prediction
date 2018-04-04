@@ -5,13 +5,13 @@ import java.util.Date;
 
 public class PlanOper {
 
-  public String contractId;
-  public BigDecimal credSumma;
-  public BigDecimal debtCredBalance;
-  public BigDecimal dogSumma;
-  public BigDecimal monthSumma;
-  public Date planDate;
-  public BigDecimal prcSumma;
+  public String contract_id;
+  public BigDecimal cred_summa;
+  public BigDecimal debt_cred_balance;
+  public BigDecimal dog_summa;
+  public BigDecimal month_summa;
+  public Date plan_date;
+  public BigDecimal prc_summa;
   public String valuta;
 
 

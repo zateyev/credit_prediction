@@ -5,14 +5,14 @@ import java.math.BigDecimal;
 public class Collateral {
 
   public String address;
-  public String collateralId;
-  public String collateralType;
-  public String contractId;
+  public String collateral_id;
+  public String collateral_type;
+  public String contract_id;
   public String description;
-  public String insuranceCompany;
+  public String insurance_company;
   public String mortgagor;
   public BigDecimal percentage;
   public BigDecimal summa;
-  public BigDecimal summaNT;
+  public BigDecimal summa_nt;
 
 }

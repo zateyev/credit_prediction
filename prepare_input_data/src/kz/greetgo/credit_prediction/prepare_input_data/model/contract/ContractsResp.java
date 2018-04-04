@@ -4,26 +4,26 @@ public class ContractsResp {
   public Client client;
   public Collateral collateral;
 
-  public String collateralAdd;
-  public String collateralVal;
-  public String conPers;
+  public String collateral_add;
+  public String collateral_val;
+  public String con_pers;
 
   public Credit credit;
   public Phone phone;
 
-  public PlanOper planOper;
+  public PlanOper plan_oper;
 
   @Override
   public String toString() {
     return "ContractsResp{" +
       "client=" + client +
       ", collateral=" + collateral +
-      ", collateralAdd='" + collateralAdd + '\'' +
-      ", collateralVal='" + collateralVal + '\'' +
-      ", conPers='" + conPers + '\'' +
+      ", collateral_add='" + collateral_add + '\'' +
+      ", collateral_val='" + collateral_val + '\'' +
+      ", con_pers='" + con_pers + '\'' +
       ", credit=" + credit +
       ", phone=" + phone +
-      ", planOper=" + planOper +
+      ", plan_oper=" + plan_oper +
       '}';
   }
 }

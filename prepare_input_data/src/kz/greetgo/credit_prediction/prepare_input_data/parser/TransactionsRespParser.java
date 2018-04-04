@@ -39,11 +39,11 @@ public class TransactionsRespParser extends ParserAbstract {
       return;
     }
 
-    if (line.trim().startsWith("operDate=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
+    if (line.trim().startsWith("oper_date=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
       if (factOper != null) {
         operDateCalF = new GregorianCalendar();
         closeBracketList.add(() -> {
-          factOper.operDate = operDateCalF.getTime();
+          factOper.oper_date = operDateCalF.getTime();
           operDateCalF = null;
         });
         return;
@@ -51,7 +51,7 @@ public class TransactionsRespParser extends ParserAbstract {
       if (accMove != null) {
         operDateCal = new GregorianCalendar();
         closeBracketList.add(() -> {
-          accMove.operDate = operDateCal.getTime();
+          accMove.oper_date = operDateCal.getTime();
           operDateCal = null;
         });
         return;
@@ -78,72 +78,72 @@ public class TransactionsRespParser extends ParserAbstract {
   @Override
   protected void readKeyValue(String key, String value) {
     if ("contractId".equals(key) && factOper != null) {
-      factOper.contractId = value;
+      factOper.contract_id = value;
       return;
     }
     if ("overdueCred".equals(key) && factOper != null) {
-      factOper.overdueCred = new BigDecimal(value);
+      factOper.overdue_cred = new BigDecimal(value);
       return;
     }
     if ("overdueCredNT".equals(key) && factOper != null) {
-      factOper.overdueCredNT = new BigDecimal(value);
+      factOper.overdue_cred_nt = new BigDecimal(value);
       return;
     }
     if ("overduePrc".equals(key) && factOper != null) {
-      factOper.overduePrc = new BigDecimal(value);
+      factOper.overdue_prc = new BigDecimal(value);
       return;
     }
     if ("overduePrcNT".equals(key) && factOper != null) {
-      factOper.overduePrcNT = new BigDecimal(value);
+      factOper.overdue_prc_nt = new BigDecimal(value);
       return;
     }
     if ("payCred".equals(key) && factOper != null) {
-      factOper.payCred = new BigDecimal(value);
+      factOper.pay_cred = new BigDecimal(value);
       return;
     }
     if ("payCredNT".equals(key) && factOper != null) {
-      factOper.payCredNT = new BigDecimal(value);
+      factOper.pay_cred_nt = new BigDecimal(value);
       return;
     }
     if ("payPrc".equals(key) && factOper != null) {
-      factOper.payPrc = new BigDecimal(value);
+      factOper.pay_prc = new BigDecimal(value);
       return;
     }
     if ("payPrc112".equals(key) && factOper != null) {
-      factOper.payPrc112 = new BigDecimal(value);
+      factOper.pay_prc_112 = new BigDecimal(value);
       return;
     }
     if ("payPrc112NT".equals(key) && factOper != null) {
-      factOper.payPrc112NT = new BigDecimal(value);
+      factOper.pay_prc_112_nt = new BigDecimal(value);
       return;
     }
 
     if ("payPrcNT".equals(key) && factOper != null) {
-      factOper.payPrcNT = new BigDecimal(value);
+      factOper.pay_prc_nt = new BigDecimal(value);
       return;
     }
     if ("penyCalcBalance".equals(key) && factOper != null) {
-      factOper.penyCalcBalance = new BigDecimal(value);
+      factOper.peny_calc_balance = new BigDecimal(value);
       return;
     }
     if ("penyCalcBalanceNT".equals(key) && factOper != null) {
-      factOper.penyCalcBalanceNT = new BigDecimal(value);
+      factOper.peny_calc_balance_nt = new BigDecimal(value);
       return;
     }
     if ("penyPay".equals(key) && factOper != null) {
-      factOper.penyPay = new BigDecimal(value);
+      factOper.peny_pay = new BigDecimal(value);
       return;
     }
     if ("penyPayNT".equals(key) && factOper != null) {
-      factOper.penyPayNT = new BigDecimal(value);
+      factOper.peny_pay_nt = new BigDecimal(value);
       return;
     }
     if ("prc112Balance".equals(key) && factOper != null) {
-      factOper.prc112Balance = new BigDecimal(value);
+      factOper.prc_112_balance = new BigDecimal(value);
       return;
     }
     if ("prc112BalanceNT".equals(key) && factOper != null) {
-      factOper.prc112BalanceNT = new BigDecimal(value);
+      factOper.prc_112_balance_nt = new BigDecimal(value);
       return;
     }
     if ("valuta".equals(key) && factOper != null) {
@@ -191,65 +191,65 @@ public class TransactionsRespParser extends ParserAbstract {
 //      return;
     }
     if ("operDate".equals(key) && factOper != null) {
-      closeBracketList.add(() -> factOper.operDate = readDate());
+      closeBracketList.add(() -> factOper.oper_date = readDate());
       return;
     }
 
     // read AccMove
     if ("accCorr".equals(key) && accMove != null) {
-      accMove.accCorr = value;
+      accMove.acc_corr = value;
       return;
     }
     if ("accMoveId".equals(key) && accMove != null) {
-      accMove.accMoveId = value;
+      accMove.acc_move_id = value;
       return;
     }
     if ("accNum".equals(key) && accMove != null) {
-      accMove.accNum = value;
+      accMove.acc_num = value;
       return;
     }
     if ("accType".equals(key) && accMove != null) {
-      accMove.accType = value;
+      accMove.acc_type = value;
       return;
     }
     if ("closeBalance".equals(key) && accMove != null) {
-      accMove.closeBalance = new BigDecimal(value);
+      accMove.close_balance = new BigDecimal(value);
       return;
     }
     if ("closeBalanceNT".equals(key) && accMove != null) {
-      accMove.closeBalanceNT = new BigDecimal(value);
+      accMove.close_balance_nt = new BigDecimal(value);
       return;
     }
     if ("contractId".equals(key) && accMove != null) {
-      accMove.contractId = value;
+      accMove.contract_id = value;
       return;
     }
     if ("openBalance".equals(key) && accMove != null) {
-      accMove.openBalance = new BigDecimal(value);
+      accMove.open_balance = new BigDecimal(value);
       return;
     }
     if ("openBalanceNT".equals(key) && accMove != null) {
-      accMove.openBalanceNT = new BigDecimal(value);
+      accMove.open_balance_nt = new BigDecimal(value);
       return;
     }
     if ("operDate".equals(key) && accMove != null) {
-      closeBracketList.add(() -> accMove.operDate = readDate());
+      closeBracketList.add(() -> accMove.oper_date = readDate());
       return;
     }
     if ("turnCred".equals(key) && accMove != null) {
-      accMove.turnCred = new BigDecimal(value);
+      accMove.turn_cred = new BigDecimal(value);
       return;
     }
     if ("turnCredNT".equals(key) && accMove != null) {
-      accMove.turnCredNT = new BigDecimal(value);
+      accMove.turn_cred_nt = new BigDecimal(value);
       return;
     }
     if ("turnDebt".equals(key) && accMove != null) {
-      accMove.turnDebt = new BigDecimal(value);
+      accMove.turn_debt = new BigDecimal(value);
       return;
     }
     if ("turnDebtNT".equals(key) && accMove != null) {
-      accMove.turnDebtNT = new BigDecimal(value);
+      accMove.turn_debt_nt = new BigDecimal(value);
       return;
     }
     if ("valuta".equals(key) && accMove != null) {
@@ -279,16 +279,16 @@ public class TransactionsRespParser extends ParserAbstract {
     connection.setAutoCommit(false);
 
     factOperPS = connection.prepareStatement("insert into fact_oper (" +
-      "no, contractId, operDate, overdueCred, overdueCredNT, overduePrc, overduePrcNT, payCred, payCredNT, payPrc, " +
-      " payPrc112, payPrc112NT, payPrcNT, penyCalcBalance, penyCalcBalanceNT, penyPay, penyPayNT, prc112Balance, " +
-      " prc112BalanceNT, valuta" +
+      "no, contract_id, oper_date, overdue_cred, overdue_cred_nt, overdue_prc, overdue_prc_nt, pay_cred, pay_cred_nt, pay_prc, " +
+      " pay_prc_112, pay_prc_112_nt, pay_prc_nt, peny_calc_balance, peny_calc_balance_nt, peny_pay, peny_pay_nt, prc_112_balance, " +
+      " prc_112_balance_nt, valuta" +
       ") values (" +
       " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
 
     accMovePS = connection.prepareStatement("insert into acc_move (" +
-      "no, accCorr, accMoveId, accNum, accType, closeBalance, closeBalanceNT, contractId, openBalance, openBalanceNT, " +
-      " operDate, turnCred, turnCredNT, turnDebt, turnDebtNT, valuta" +
+      "no, acc_corr, acc_move_id, acc_num, acc_type, close_balance, close_balance_nt, contract_id, open_balance, open_balance_nt, " +
+      " oper_date, turn_cred, turn_cred_nt, turn_debt, turn_debt_nt, valuta" +
       ") values (" +
       " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
@@ -298,43 +298,43 @@ public class TransactionsRespParser extends ParserAbstract {
   protected void createTables() throws SQLException {
     DbAccess.createTable(connection, "create table fact_oper (" +
       "   no bigint primary key," +
-      "   contractId varchar(20)," +
-      "   operDate date," +
-      "   overdueCred decimal," +
-      "   overdueCredNT decimal," +
-      "   overduePrc decimal," +
-      "   overduePrcNT decimal," +
-      "   payCred decimal," +
-      "   payCredNT decimal," +
-      "   payPrc decimal," +
-      "   payPrc112 decimal," +
-      "   payPrc112NT decimal," +
-      "   payPrcNT decimal," +
-      "   penyCalcBalance decimal," +
-      "   penyCalcBalanceNT decimal," +
-      "   penyPay decimal," +
-      "   penyPayNT decimal," +
-      "   prc112Balance decimal," +
-      "   prc112BalanceNT decimal," +
+      "   contract_id varchar(20)," +
+      "   oper_date date," +
+      "   overdue_cred decimal," +
+      "   overdue_cred_nt decimal," +
+      "   overdue_prc decimal," +
+      "   overdue_prc_nt decimal," +
+      "   pay_cred decimal," +
+      "   pay_cred_nt decimal," +
+      "   pay_prc decimal," +
+      "   pay_prc_112 decimal," +
+      "   pay_prc_112_nt decimal," +
+      "   pay_prc_nt decimal," +
+      "   peny_calc_balance decimal," +
+      "   peny_calc_balance_nt decimal," +
+      "   peny_pay decimal," +
+      "   peny_pay_nt decimal," +
+      "   prc_112_balance decimal," +
+      "   prc_112_balance_nt decimal," +
       "   valuta varchar(20)" +
       ")");
 
     DbAccess.createTable(connection, "create table acc_move (" +
       "   no bigint primary key," +
-      "   accCorr varchar(30)," +
-      "   accMoveId varchar(30)," +
-      "   accNum varchar(30)," +
-      "   accType varchar(30)," +
-      "   closeBalance decimal," +
-      "   closeBalanceNT decimal," +
-      "   contractId varchar(20)," +
-      "   openBalance decimal," +
-      "   openBalanceNT decimal," +
-      "   operDate Date," +
-      "   turnCred decimal," +
-      "   turnCredNT decimal," +
-      "   turnDebt decimal," +
-      "   turnDebtNT decimal," +
+      "   acc_corr varchar(30)," +
+      "   acc_move_id varchar(30)," +
+      "   acc_num varchar(30)," +
+      "   acc_type varchar(30)," +
+      "   close_balance decimal," +
+      "   close_balance_nt decimal," +
+      "   contract_id varchar(20)," +
+      "   open_balance decimal," +
+      "   open_balance_nt decimal," +
+      "   oper_date Date," +
+      "   turn_cred decimal," +
+      "   turn_cred_nt decimal," +
+      "   turn_debt decimal," +
+      "   turn_debt_nt decimal," +
       "   valuta varchar(20)" +
       ")");
   }
@@ -344,24 +344,24 @@ public class TransactionsRespParser extends ParserAbstract {
 
     int ind = 1;
     factOperPS.setLong(ind++, factOperNo++);
-    factOperPS.setString(ind++, factOper.contractId);
-    factOperPS.setObject(ind++, toDate(factOper.operDate));
-    factOperPS.setBigDecimal(ind++, factOper.overdueCred);
-    factOperPS.setBigDecimal(ind++, factOper.overdueCredNT);
-    factOperPS.setBigDecimal(ind++, factOper.overduePrc);
-    factOperPS.setBigDecimal(ind++, factOper.overdueCredNT);
-    factOperPS.setBigDecimal(ind++, factOper.payCred);
-    factOperPS.setBigDecimal(ind++, factOper.payCredNT);
-    factOperPS.setBigDecimal(ind++, factOper.payPrc);
-    factOperPS.setBigDecimal(ind++, factOper.payPrc112);
-    factOperPS.setBigDecimal(ind++, factOper.payPrc112NT);
-    factOperPS.setBigDecimal(ind++, factOper.payPrcNT);
-    factOperPS.setBigDecimal(ind++, factOper.penyCalcBalance);
-    factOperPS.setBigDecimal(ind++, factOper.penyCalcBalanceNT);
-    factOperPS.setBigDecimal(ind++, factOper.penyPay);
-    factOperPS.setBigDecimal(ind++, factOper.penyPayNT);
-    factOperPS.setBigDecimal(ind++, factOper.prc112Balance);
-    factOperPS.setBigDecimal(ind++, factOper.prc112BalanceNT);
+    factOperPS.setString(ind++, factOper.contract_id);
+    factOperPS.setObject(ind++, toDate(factOper.oper_date));
+    factOperPS.setBigDecimal(ind++, factOper.overdue_cred);
+    factOperPS.setBigDecimal(ind++, factOper.overdue_cred_nt);
+    factOperPS.setBigDecimal(ind++, factOper.overdue_prc);
+    factOperPS.setBigDecimal(ind++, factOper.overdue_cred_nt);
+    factOperPS.setBigDecimal(ind++, factOper.pay_cred);
+    factOperPS.setBigDecimal(ind++, factOper.pay_cred_nt);
+    factOperPS.setBigDecimal(ind++, factOper.pay_prc);
+    factOperPS.setBigDecimal(ind++, factOper.pay_prc_112);
+    factOperPS.setBigDecimal(ind++, factOper.pay_prc_112_nt);
+    factOperPS.setBigDecimal(ind++, factOper.pay_prc_nt);
+    factOperPS.setBigDecimal(ind++, factOper.peny_calc_balance);
+    factOperPS.setBigDecimal(ind++, factOper.peny_calc_balance_nt);
+    factOperPS.setBigDecimal(ind++, factOper.peny_pay);
+    factOperPS.setBigDecimal(ind++, factOper.peny_pay_nt);
+    factOperPS.setBigDecimal(ind++, factOper.prc_112_balance);
+    factOperPS.setBigDecimal(ind++, factOper.prc_112_balance_nt);
     factOperPS.setString(ind, factOper.valuta);
     factOperPS.addBatch();
     factOperBatchSize++;
@@ -380,20 +380,20 @@ public class TransactionsRespParser extends ParserAbstract {
 
     int ind = 1;
     accMovePS.setLong(ind++, accMoveNo++);
-    accMovePS.setString(ind++, accMove.accCorr);
-    accMovePS.setString(ind++, accMove.accMoveId);
-    accMovePS.setString(ind++, accMove.accNum);
-    accMovePS.setString(ind++, accMove.accType);
-    accMovePS.setBigDecimal(ind++, accMove.closeBalance);
-    accMovePS.setBigDecimal(ind++, accMove.closeBalanceNT);
-    accMovePS.setString(ind++, accMove.contractId);
-    accMovePS.setBigDecimal(ind++, accMove.openBalance);
-    accMovePS.setBigDecimal(ind++, accMove.openBalanceNT);
-    accMovePS.setObject(ind++, toDate(accMove.operDate));
-    accMovePS.setBigDecimal(ind++, accMove.turnCred);
-    accMovePS.setBigDecimal(ind++, accMove.turnCredNT);
-    accMovePS.setBigDecimal(ind++, accMove.turnDebt);
-    accMovePS.setBigDecimal(ind++, accMove.turnDebtNT);
+    accMovePS.setString(ind++, accMove.acc_corr);
+    accMovePS.setString(ind++, accMove.acc_move_id);
+    accMovePS.setString(ind++, accMove.acc_num);
+    accMovePS.setString(ind++, accMove.acc_type);
+    accMovePS.setBigDecimal(ind++, accMove.close_balance);
+    accMovePS.setBigDecimal(ind++, accMove.close_balance_nt);
+    accMovePS.setString(ind++, accMove.contract_id);
+    accMovePS.setBigDecimal(ind++, accMove.open_balance);
+    accMovePS.setBigDecimal(ind++, accMove.open_balance_nt);
+    accMovePS.setObject(ind++, toDate(accMove.oper_date));
+    accMovePS.setBigDecimal(ind++, accMove.turn_cred);
+    accMovePS.setBigDecimal(ind++, accMove.turn_cred_nt);
+    accMovePS.setBigDecimal(ind++, accMove.turn_debt);
+    accMovePS.setBigDecimal(ind++, accMove.turn_debt_nt);
     accMovePS.setString(ind, accMove.valuta);
     accMovePS.addBatch();
     accMoveBatchSize++;

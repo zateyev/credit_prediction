@@ -36,36 +36,36 @@ public class ContractsRespParser extends ParserAbstract {
     connection.setAutoCommit(false);
 
     clientPS = connection.prepareStatement("insert into client_tmp (" +
-      "no, clientId, dateBirth, firstname, surname, patronymic, inn, numSeriaPassport, sex, type, factAddress, regAddress, " +
-      "typePassport, whoIssuePassport" +
+      "no, client_id, date_birth, firstname, surname, patronymic, inn, num_seria_passport, sex, type, fact_address, reg_address, " +
+      "type_passport, who_issue_passport" +
       ") values (" +
       " ?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
 
     creditPS = connection.prepareStatement("insert into credit_tmp (" +
-      "no, contractId, clientId, branch, branchCode, contractManager, contractManagerADUser, credLineId, departCode, departName, " +
-      "dogSumma, dogSummaNT, gracePeriod, groupConvNum, kindCredit, methodCalcPrc, nameGroupClient, numDog, numDogCredLine, " +
-      "podSectorCred, prcRate, prePaymentAcc, product, rateAdminPrc, sectorCred, codeGroupClient, contractManagerDepCode, stupenCred, " +
-      "sumAdminPrc, sumAdminPrcNT, sumCredLine, valuta, dateBegin, dateEnd, dateOpen" + //35
+      "no, contract_id, client_id, branch, branch_code, contract_manager, contract_manager_ad_user, cred_line_id, depart_code, depart_name, " +
+      "dog_summa, dog_summa_nt, grace_period, group_conv_num, kind_credit, method_calc_prc, name_group_client, num_dog, num_dog_cred_line, " +
+      "pod_sector_cred, prc_rate, pre_payment_acc, product, rate_admin_prc, sector_cred, code_group_client, contract_manager_dep_code, stupen_cred, " +
+      "sum_admin_prc, sum_admin_prc_nt, sum_cred_line, valuta, date_begin, date_end, date_open" + //35
       ") values (" +
       " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
 
     collateralPS = connection.prepareStatement("insert into collateral (" +
-      "no, address, collateralId, collateralType, contractId, description, insuranceCompany, mortgagor, " +
-      " percentage, summa, summaNT" +
+      "no, address, collateral_id, collateral_type, contract_id, description, insurance_company, mortgagor, " +
+      " percentage, summa, summa_nt" +
       ") values (" +
       " ?,?,?,?,?,?,?,?,?,?,?" +
       ")");
 
     phonePS = connection.prepareStatement("insert into phone_tmp (" +
-      "no, clientId, phoneId, phoneNumStatus, phoneNumType, phoneNumb" +
+      "no, client_id, phone_id, phone_num_status, phone_num_type, phone_numb" +
       ") values (" +
       " ?,?,?,?,?,?" +
       ")");
 
     planOperPS = connection.prepareStatement("insert into plan_oper_tmp (" +
-      "no, contractId, credSumma, debtCredBalance, dogSumma, monthSumma, prcSumma, valuta, planDate" +
+      "no, contract_id, cred_summa, debt_cred_balance, dog_summa, month_summa, prc_summa, valuta, plan_date" +
       ") values (" +
       " ?,?,?,?,?,?,?,?,?" +
       ")");
@@ -76,91 +76,91 @@ public class ContractsRespParser extends ParserAbstract {
     DbAccess.createTable(connection, "create table client_tmp (" +
       "  no         bigint primary key," +
       "  status int not null default 0," +
-      "  clientId   varchar(20)," +
-      "  dateBirth  date," +
+      "  client_id   varchar(20)," +
+      "  date_birth  date," +
       "  firstname  varchar(300)," +
       "  surname    varchar(300)," +
       "  patronymic varchar(300)," +
       "  inn varchar(50)," +
-      "  numSeriaPassport varchar(50)," +
+      "  num_seria_passport varchar(50)," +
       "  sex varchar(20)," +
       "  type varchar(30)," +
-      "  factAddress varchar(300)," +
-      "  regAddress varchar(300)," +
-      "  typePassport varchar(30)," +
-      "  whoIssuePassport varchar(300)" +
+      "  fact_address varchar(300)," +
+      "  reg_address varchar(300)," +
+      "  type_passport varchar(30)," +
+      "  who_issue_passport varchar(300)" +
       ")");
     DbAccess.createTable(connection, "create table credit_tmp (" +
       "  no         bigint primary key," +
       "  status int not null default 0," +
-      "  contractId   varchar(20)," +
-      "  clientId   varchar(20)," +
+      "  contract_id   varchar(20)," +
+      "  client_id   varchar(20)," +
       "  branch  varchar(300)," +
-      "  branchCode  varchar(300)," +
-      "  contractManager    varchar(300)," +
-      "  contractManagerADUser varchar(300)," +
-      "  credLineId varchar(300)," +
-      "  departCode varchar(300)," +
-      "  departName varchar(300)," +
-      "  dogSumma decimal," +
-      "  dogSummaNT decimal," +
-      "  gracePeriod int," +
-      "  groupConvNum varchar(300)," +
-      "  kindCredit varchar(300)," +
-      "  methodCalcPrc varchar(300)," +
-      "  nameGroupClient varchar(300)," +
-      "  numDog varchar(50)," +
-      "  numDogCredLine varchar(50)," +
-      "  podSectorCred varchar(300)," +
-      "  prcRate decimal," +
-      "  prePaymentAcc varchar(300)," +
+      "  branch_code  varchar(300)," +
+      "  contract_manager    varchar(300)," +
+      "  contract_manager_ad_user varchar(300)," +
+      "  cred_line_id varchar(300)," +
+      "  depart_code varchar(300)," +
+      "  depart_name varchar(300)," +
+      "  dog_summa decimal," +
+      "  dog_summa_nt decimal," +
+      "  grace_period int," +
+      "  group_conv_num varchar(300)," +
+      "  kind_credit varchar(300)," +
+      "  method_calc_prc varchar(300)," +
+      "  name_group_client varchar(300)," +
+      "  num_dog varchar(50)," +
+      "  num_dog_cred_line varchar(50)," +
+      "  pod_sector_cred varchar(300)," +
+      "  prc_rate decimal," +
+      "  pre_payment_acc varchar(300)," +
       "  product varchar(300)," +
-      "  rateAdminPrc decimal," +
-      "  sectorCred varchar(300)," +
-      "  codeGroupClient varchar(300)," +
-      "  contractManagerDepCode varchar(300)," +
-      "  stupenCred int," +
-      "  sumAdminPrc decimal," +
-      "  sumAdminPrcNT decimal," +
-      "  sumCredLine decimal," +
+      "  rate_admin_prc decimal," +
+      "  sector_cred varchar(300)," +
+      "  code_group_client varchar(300)," +
+      "  contract_manager_dep_code varchar(300)," +
+      "  stupen_cred int," +
+      "  sum_admin_prc decimal," +
+      "  sum_admin_prc_nt decimal," +
+      "  sum_cred_line decimal," +
       "  valuta varchar(20)," +
-      "  dateBegin  date," +
-      "  dateEnd  date," +
-      "  dateOpen  date" +
+      "  date_begin  date," +
+      "  date_end  date," +
+      "  date_open  date" +
       ")");
     DbAccess.createTable(connection, "create table collateral (" +
       "  no             bigint primary key," +
       "  status int not null default 0," +
       "  address varchar(300)," +
-      "  collateralId varchar(300)," +
-      "  collateralType varchar(300)," +
-      "  contractId varchar(300)," +
+      "  collateral_id varchar(300)," +
+      "  collateral_type varchar(300)," +
+      "  contract_id varchar(300)," +
       "  description varchar(300)," +
-      "  insuranceCompany varchar(300)," +
+      "  insurance_company varchar(300)," +
       "  mortgagor varchar(300)," +
       "  percentage decimal," +
       "  summa decimal," +
-      "  summaNT decimal" +
+      "  summa_nt decimal" +
       ")");
     DbAccess.createTable(connection, "create table phone_tmp (" +
       "  no             bigint primary key," +
       "  status int not null default 0," +
-      "  clientId       varchar(20)," +
-      "  phoneId        varchar(20)," +
-      "  phoneNumStatus varchar(50)," +
-      "  phoneNumType   varchar(50)," +
-      "  phoneNumb      varchar(50)" +
+      "  client_id       varchar(20)," +
+      "  phone_id        varchar(20)," +
+      "  phone_num_status varchar(50)," +
+      "  phone_num_type   varchar(50)," +
+      "  phone_numb      varchar(50)" +
       ")");
     DbAccess.createTable(connection, "create table plan_oper_tmp (" +
       "  no              bigint primary key," +
-      "  contractId      varchar(20)," +
-      "  credSumma       decimal," +
-      "  debtCredBalance decimal," +
-      "  dogSumma        decimal," +
-      "  monthSumma      decimal," +
-      "  prcSumma        decimal," +
+      "  contract_id      varchar(20)," +
+      "  cred_summa       decimal," +
+      "  debt_cred_balance decimal," +
+      "  dog_summa        decimal," +
+      "  month_summa      decimal," +
+      "  prc_summa        decimal," +
       "  valuta          varchar(20)," +
-      "  planDate        date" +
+      "  plan_date        date" +
       ")");
   }
 
@@ -175,19 +175,19 @@ public class ContractsRespParser extends ParserAbstract {
 
     int ind = 1;
     clientPS.setLong(ind++, clientNo++);
-    clientPS.setString(ind++, client.clientId);
-    clientPS.setObject(ind++, toDate(client.dateBirth));
+    clientPS.setString(ind++, client.client_id);
+    clientPS.setObject(ind++, toDate(client.date_birth));
     clientPS.setString(ind++, client.firstname);
     clientPS.setString(ind++, client.surname);
     clientPS.setString(ind++, client.patronymic);
     clientPS.setString(ind++, client.inn);
-    clientPS.setString(ind++, client.numSeriaPassport);
+    clientPS.setString(ind++, client.num_seria_passport);
     clientPS.setString(ind++, client.sex);
     clientPS.setString(ind++, client.type);
-    clientPS.setString(ind++, client.factAddress);
-    clientPS.setString(ind++, client.regAddress);
-    clientPS.setString(ind++, client.typePassport);
-    clientPS.setString(ind, client.whoIssuePassport);
+    clientPS.setString(ind++, client.fact_address);
+    clientPS.setString(ind++, client.reg_address);
+    clientPS.setString(ind++, client.type_passport);
+    clientPS.setString(ind, client.who_issue_passport);
     clientPS.addBatch();
     clientBatchSize++;
 
@@ -201,34 +201,38 @@ public class ContractsRespParser extends ParserAbstract {
   }
 
   @Override
-  protected void finish() throws SQLException {
-    if (clientBatchSize > 0) {
-      clientPS.executeBatch();
-      clientBatchSize = 0;
-    }
-    if (creditBatchSize > 0) {
-      try {
-
-        creditPS.executeBatch();
-      }catch (SQLException e) {
-        throw new RuntimeException(e.getNextException());
+  protected void finish() {
+    try {
+      if (clientBatchSize > 0) {
+        clientPS.executeBatch();
+        clientBatchSize = 0;
       }
-      creditBatchSize = 0;
+      if (creditBatchSize > 0) {
+        try {
+
+          creditPS.executeBatch();
+        }catch (SQLException e) {
+          throw new RuntimeException(e.getNextException());
+        }
+        creditBatchSize = 0;
+      }
+      if (phoneBatchSize > 0) {
+        phonePS.executeBatch();
+        phoneBatchSize = 0;
+      }
+      if (planOperBatchSize > 0) {
+        planOperPS.executeBatch();
+        planOperBatchSize = 0;
+      }
+      if (collateralBatchSize > 0) {
+        collateralPS.executeBatch();
+        collateralBatchSize = 0;
+      }
+      connection.commit();
+      goContractsResp();
+    } catch (SQLException e) {
+      throw new RuntimeException(e.getNextException());
     }
-    if (phoneBatchSize > 0) {
-      phonePS.executeBatch();
-      phoneBatchSize = 0;
-    }
-    if (planOperBatchSize > 0) {
-      planOperPS.executeBatch();
-      planOperBatchSize = 0;
-    }
-    if (collateralBatchSize > 0) {
-      collateralPS.executeBatch();
-      collateralBatchSize = 0;
-    }
-    connection.commit();
-    goContractsResp();
   }
 
   @Override
@@ -317,15 +321,15 @@ public class ContractsRespParser extends ParserAbstract {
     int ind = 1;
     collateralPS.setLong(ind++, collateralNo++);
     collateralPS.setString(ind++, collateral.address);
-    collateralPS.setString(ind++, collateral.collateralId);
-    collateralPS.setString(ind++, collateral.collateralType);
-    collateralPS.setString(ind++, collateral.contractId);
+    collateralPS.setString(ind++, collateral.collateral_id);
+    collateralPS.setString(ind++, collateral.collateral_type);
+    collateralPS.setString(ind++, collateral.contract_id);
     collateralPS.setString(ind++, collateral.description);
-    collateralPS.setString(ind++, collateral.insuranceCompany);
+    collateralPS.setString(ind++, collateral.insurance_company);
     collateralPS.setString(ind++, collateral.mortgagor);
     collateralPS.setBigDecimal(ind++, collateral.percentage);
     collateralPS.setBigDecimal(ind++, collateral.summa);
-    collateralPS.setBigDecimal(ind, collateral.summaNT);
+    collateralPS.setBigDecimal(ind, collateral.summa_nt);
     collateralPS.addBatch();
     collateralBatchSize++;
 
@@ -343,40 +347,40 @@ public class ContractsRespParser extends ParserAbstract {
 
     int ind = 1;
     creditPS.setLong(ind++, creditNo++);
-    creditPS.setString(ind++, credit.contractId);
-    creditPS.setString(ind++, credit.clientId);
+    creditPS.setString(ind++, credit.contract_id);
+    creditPS.setString(ind++, credit.client_id);
     creditPS.setString(ind++, credit.branch);
-    creditPS.setString(ind++, credit.branchCode);
-    creditPS.setString(ind++, credit.contractManager);
-    creditPS.setString(ind++, credit.contractManagerADUser);
-    creditPS.setString(ind++, credit.credLineId);
-    creditPS.setString(ind++, credit.departCode);
-    creditPS.setString(ind++, credit.departName);
-    creditPS.setBigDecimal(ind++, credit.dogSumma);
-    creditPS.setBigDecimal(ind++, credit.dogSummaNT);
-    creditPS.setInt(ind++, credit.gracePeriod);
-    creditPS.setString(ind++, credit.groupConvNum);
-    creditPS.setString(ind++, credit.kindCredit);
-    creditPS.setString(ind++, credit.methodCalcPrc);
-    creditPS.setString(ind++, credit.nameGroupClient);
-    creditPS.setString(ind++, credit.numDog);
-    creditPS.setString(ind++, credit.numDogCredLine);
-    creditPS.setString(ind++, credit.podSectorCred);
-    creditPS.setBigDecimal(ind++, credit.prcRate);
-    creditPS.setString(ind++, credit.prePaymentAcc);
+    creditPS.setString(ind++, credit.branch_code);
+    creditPS.setString(ind++, credit.contract_manager);
+    creditPS.setString(ind++, credit.contract_manager_ad_user);
+    creditPS.setString(ind++, credit.cred_line_id);
+    creditPS.setString(ind++, credit.depart_code);
+    creditPS.setString(ind++, credit.depart_name);
+    creditPS.setBigDecimal(ind++, credit.dog_summa);
+    creditPS.setBigDecimal(ind++, credit.dog_summa_nt);
+    creditPS.setInt(ind++, credit.grace_period);
+    creditPS.setString(ind++, credit.group_conv_num);
+    creditPS.setString(ind++, credit.kind_credit);
+    creditPS.setString(ind++, credit.method_calc_prc);
+    creditPS.setString(ind++, credit.name_group_client);
+    creditPS.setString(ind++, credit.num_dog);
+    creditPS.setString(ind++, credit.num_dog_cred_line);
+    creditPS.setString(ind++, credit.pod_sector_cred);
+    creditPS.setBigDecimal(ind++, credit.prc_rate);
+    creditPS.setString(ind++, credit.pre_payment_acc);
     creditPS.setString(ind++, credit.product);
-    creditPS.setBigDecimal(ind++, credit.rateAdminPrc);
-    creditPS.setString(ind++, credit.sectorCred);
-    creditPS.setString(ind++, credit.codeGroupClient);
-    creditPS.setString(ind++, credit.contractManagerDepCode);
-    creditPS.setInt(ind++, credit.stupenCred);
-    creditPS.setBigDecimal(ind++, credit.sumAdminPrc);
-    creditPS.setBigDecimal(ind++, credit.sumAdminPrcNT);
-    creditPS.setBigDecimal(ind++, credit.sumCredLine);
+    creditPS.setBigDecimal(ind++, credit.rate_admin_prc);
+    creditPS.setString(ind++, credit.sector_cred);
+    creditPS.setString(ind++, credit.code_group_client);
+    creditPS.setString(ind++, credit.contract_manager_dep_code);
+    creditPS.setInt(ind++, credit.stupen_cred);
+    creditPS.setBigDecimal(ind++, credit.sum_admin_prc);
+    creditPS.setBigDecimal(ind++, credit.sum_admin_prc_nt);
+    creditPS.setBigDecimal(ind++, credit.sum_cred_line);
     creditPS.setString(ind++, credit.valuta);
-    creditPS.setObject(ind++, toDate(credit.dateBegin));
-    creditPS.setObject(ind++, toDate(credit.dateEnd));
-    creditPS.setObject(ind, toDate(credit.dateOpen));
+    creditPS.setObject(ind++, toDate(credit.date_begin));
+    creditPS.setObject(ind++, toDate(credit.date_end));
+    creditPS.setObject(ind, toDate(credit.date_open));
     creditPS.addBatch();
     creditBatchSize++;
 
@@ -394,14 +398,14 @@ public class ContractsRespParser extends ParserAbstract {
 
     int ind = 1;
     planOperPS.setLong(ind++, planOperNo++);
-    planOperPS.setString(ind++, planOper.contractId);
-    planOperPS.setBigDecimal(ind++, planOper.credSumma);
-    planOperPS.setBigDecimal(ind++, planOper.debtCredBalance);
-    planOperPS.setBigDecimal(ind++, planOper.dogSumma);
-    planOperPS.setBigDecimal(ind++, planOper.monthSumma);
-    planOperPS.setBigDecimal(ind++, planOper.prcSumma);
+    planOperPS.setString(ind++, planOper.contract_id);
+    planOperPS.setBigDecimal(ind++, planOper.cred_summa);
+    planOperPS.setBigDecimal(ind++, planOper.debt_cred_balance);
+    planOperPS.setBigDecimal(ind++, planOper.dog_summa);
+    planOperPS.setBigDecimal(ind++, planOper.month_summa);
+    planOperPS.setBigDecimal(ind++, planOper.prc_summa);
     planOperPS.setString(ind++, planOper.valuta);
-    planOperPS.setObject(ind, toDate(planOper.planDate));
+    planOperPS.setObject(ind, toDate(planOper.plan_date));
     planOperPS.addBatch();
     planOperBatchSize++;
 
@@ -419,11 +423,11 @@ public class ContractsRespParser extends ParserAbstract {
 
     int ind = 1;
     phonePS.setLong(ind++, phoneNo++);
-    phonePS.setString(ind++, phone.clientId);
-    phonePS.setString(ind++, phone.phoneId);
-    phonePS.setString(ind++, phone.phoneNumStatus);
-    phonePS.setString(ind++, phone.phoneNumType);
-    phonePS.setString(ind, phone.phoneNumb);
+    phonePS.setString(ind++, phone.client_id);
+    phonePS.setString(ind++, phone.phone_id);
+    phonePS.setString(ind++, phone.phone_num_status);
+    phonePS.setString(ind++, phone.phone_num_type);
+    phonePS.setString(ind, phone.phone_numb);
     phonePS.addBatch();
     phoneBatchSize++;
 
@@ -456,32 +460,32 @@ public class ContractsRespParser extends ParserAbstract {
     }
     if ("dateBirth".equals(key)) {
       inDate = true;
-      closeBracketList.add(() -> client.dateBirth = readDate());
+      closeBracketList.add(() -> client.date_birth = readDate());
       return;
     }
     if ("dateIssuePassport".equals(key)) {
       inDate = true;
-      closeBracketList.add(() -> client.dateIssuePassport = readDate());
+      closeBracketList.add(() -> client.date_issue_passport = readDate());
       return;
     }
     if ("dateBegin".equals(key)) {
       inDate = true;
-      closeBracketList.add(() -> credit.dateBegin = readDate());
+      closeBracketList.add(() -> credit.date_begin = readDate());
       return;
     }
     if ("dateEnd".equals(key)) {
       inDate = true;
-      closeBracketList.add(() -> credit.dateEnd = readDate());
+      closeBracketList.add(() -> credit.date_end = readDate());
       return;
     }
     if ("dateOpen".equals(key)) {
       inDate = true;
-      closeBracketList.add(() -> credit.dateOpen = readDate());
+      closeBracketList.add(() -> credit.date_open = readDate());
       return;
     }
     if ("planDate".equals(key)) {
       inDate = true;
-      closeBracketList.add(() -> planOper.planDate = readDate());
+      closeBracketList.add(() -> planOper.plan_date = readDate());
       return;
     }
 
@@ -502,7 +506,7 @@ public class ContractsRespParser extends ParserAbstract {
       return;
     }
     if ("numSeriaPassport".equals(key)) {
-      client.numSeriaPassport = value;
+      client.num_seria_passport = value;
       return;
     }
     if ("sex".equals(key)) {
@@ -514,29 +518,29 @@ public class ContractsRespParser extends ParserAbstract {
       return;
     }
     if ("factAddress".equals(key)) {
-      client.factAddress = value;
+      client.fact_address = value;
       return;
     }
     if ("regAddress".equals(key)) {
-      client.regAddress = value;
+      client.reg_address = value;
       return;
     }
     if ("typePassport".equals(key)) {
-      client.typePassport = value;
+      client.type_passport = value;
       return;
     }
     if ("whoIssuePassport".equals(key)) {
-      client.whoIssuePassport = value;
+      client.who_issue_passport = value;
       return;
     }
     if ("clientId".equals(key)) {
-      client.clientId = value;
+      client.client_id = value;
       if (phone != null) {
-        phone.clientId = value;
+        phone.client_id = value;
         return;
       }
       if (credit != null) {
-        credit.clientId = value;
+        credit.client_id = value;
         return;
       }
     }
@@ -548,79 +552,79 @@ public class ContractsRespParser extends ParserAbstract {
       return;
     }
     if ("branchCode".equals(key) && credit != null) {
-      credit.branchCode = value;
+      credit.branch_code = value;
       return;
     }
     if ("contractId".equals(key) && credit != null) {
-      credit.contractId = value;
+      credit.contract_id = value;
       return;
     }
     if ("contractManager".equals(key) && credit != null) {
-      credit.contractManager = value;
+      credit.contract_manager = value;
       return;
     }
     if ("contractManagerADUser".equals(key) && credit != null) {
-      credit.contractManagerADUser = value;
+      credit.contract_manager_ad_user = value;
       return;
     }
     if ("credLineId".equals(key) && credit != null) {
-      credit.credLineId = value;
+      credit.cred_line_id = value;
       return;
     }
     if ("departCode".equals(key) && credit != null) {
-      credit.departCode = value;
+      credit.depart_code = value;
       return;
     }
     if ("departName".equals(key) && credit != null) {
-      credit.departName = value;
+      credit.depart_name = value;
       return;
     }
     if ("dogSumma".equals(key) && credit != null) {
-      credit.dogSumma = new BigDecimal(value);
+      credit.dog_summa = new BigDecimal(value);
       return;
     }
     if ("dogSummaNT".equals(key) && credit != null) {
-      credit.dogSummaNT = new BigDecimal(value);
+      credit.dog_summa_nt = new BigDecimal(value);
       return;
     }
     if ("gracePeriod".equals(key) && credit != null) {
-      credit.gracePeriod = Integer.parseInt(value);
+      credit.grace_period = Integer.parseInt(value);
       return;
     }
     if ("groupConvNum".equals(key) && credit != null) {
-      credit.groupConvNum = value;
+      credit.group_conv_num = value;
       return;
     }
     if ("kindCredit".equals(key) && credit != null) {
-      credit.kindCredit = value;
+      credit.kind_credit = value;
       return;
     }
     if ("methodCalcPrc".equals(key) && credit != null) {
-      credit.methodCalcPrc = value;
+      credit.method_calc_prc = value;
       return;
     }
     if ("nameGroupClient".equals(key) && credit != null) {
-      credit.nameGroupClient = value;
+      credit.name_group_client = value;
       return;
     }
     if ("numDog".equals(key) && credit != null) {
-      credit.numDog = value;
+      credit.num_dog = value;
       return;
     }
     if ("numDogCredLine".equals(key) && credit != null) {
-      credit.numDogCredLine = value;
+      credit.num_dog_cred_line = value;
       return;
     }
     if ("podSectorCred".equals(key) && credit != null) {
-      credit.podSectorCred = value;
+      credit.pod_sector_cred = value;
       return;
     }
     if ("prcRate".equals(key) && credit != null) {
-      credit.prcRate = new BigDecimal(value);
+      credit.prc_rate = new BigDecimal(value);
       return;
     }
     if ("prePaymentAcc".equals(key) && credit != null) {
-      credit.prePaymentAcc = value;
+      credit.pre_payment_acc = value;
       return;
     }
     if ("product".equals(key) && credit != null) {
@@ -628,35 +632,35 @@ public class ContractsRespParser extends ParserAbstract {
       return;
     }
     if ("rateAdminPrc".equals(key) && credit != null) {
-      credit.rateAdminPrc = new BigDecimal(value);
+      credit.rate_admin_prc = new BigDecimal(value);
       return;
     }
     if ("sectorCred".equals(key) && credit != null) {
-      credit.sectorCred = value;
+      credit.sector_cred = value;
       return;
     }
     if ("codeGroupClient".equals(key) && credit != null) {
-      credit.codeGroupClient = value;
+      credit.code_group_client = value;
       return;
     }
     if ("contractManagerDepCode".equals(key) && credit != null) {
-      credit.contractManagerDepCode = value;
+      credit.contract_manager_dep_code = value;
       return;
     }
     if ("stupenCred".equals(key) && credit != null) {
-      credit.stupenCred = Integer.parseInt(value);
+      credit.stupen_cred = Integer.parseInt(value);
       return;
     }
     if ("sumAdminPrc".equals(key) && credit != null) {
-      credit.sumAdminPrc = new BigDecimal(value);
+      credit.sum_admin_prc = new BigDecimal(value);
       return;
     }
     if ("sumAdminPrcNT".equals(key) && credit != null) {
-      credit.sumAdminPrcNT = new BigDecimal(value);
+      credit.sum_admin_prc_nt = new BigDecimal(value);
       return;
     }
     if ("sumCredLine".equals(key) && credit != null) {
-      credit.sumCredLine = new BigDecimal(value);
+      credit.sum_cred_line = new BigDecimal(value);
       return;
     }
     if ("valuta".equals(key) && credit != null) {
@@ -670,15 +674,15 @@ public class ContractsRespParser extends ParserAbstract {
       return;
     }
     if ("collateralId".equals(key) && collateral != null) {
-      collateral.collateralId = value;
+      collateral.collateral_id = value;
       return;
     }
     if ("collateralType".equals(key) && collateral != null) {
-      collateral.collateralType = value;
+      collateral.collateral_type = value;
       return;
     }
     if ("contractId".equals(key) && collateral != null) {
-      collateral.contractId = value;
+      collateral.contract_id = value;
       return;
     }
     if ("description".equals(key) && collateral != null) {
@@ -686,7 +690,7 @@ public class ContractsRespParser extends ParserAbstract {
       return;
     }
     if ("insuranceCompany".equals(key) && collateral != null) {
-      collateral.insuranceCompany = value;
+      collateral.insurance_company = value;
       return;
     }
     if ("mortgagor".equals(key) && collateral != null) {
@@ -702,52 +706,52 @@ public class ContractsRespParser extends ParserAbstract {
       return;
     }
     if ("summaNT".equals(key) && collateral != null) {
-      collateral.summaNT = new BigDecimal(value);
+      collateral.summa_nt = new BigDecimal(value);
       return;
     }
 
 
     //read phone fields
     if ("phoneId".equals(key) && phone != null) {
-      phone.phoneId = value;
+      phone.phone_id = value;
       return;
     }
     if ("phoneNumStatus".equals(key) && phone != null) {
-      phone.phoneNumStatus = value;
+      phone.phone_num_status = value;
       return;
     }
     if ("phoneNumType".equals(key) && phone != null) {
-      phone.phoneNumType = value;
+      phone.phone_num_type = value;
       return;
     }
     if ("phoneNumb".equals(key) && phone != null) {
-      phone.phoneNumb = value;
+      phone.phone_numb = value;
       return;
     }
 
-    //read planOper fields
+    //read plan_oper fields
     if ("contractId".equals(key) && planOper != null) {
-      planOper.contractId = value;
+      planOper.contract_id = value;
       return;
     }
     if ("credSumma".equals(key) && planOper != null) {
-      planOper.credSumma = new BigDecimal(value);
+      planOper.cred_summa = new BigDecimal(value);
       return;
     }
     if ("debtCredBalance".equals(key) && planOper != null) {
-      planOper.debtCredBalance = new BigDecimal(value);
+      planOper.debt_cred_balance = new BigDecimal(value);
       return;
     }
     if ("dogSumma".equals(key) && planOper != null) {
-      planOper.dogSumma = new BigDecimal(value);
+      planOper.dog_summa = new BigDecimal(value);
       return;
     }
     if ("monthSumma".equals(key) && planOper != null) {
-      planOper.monthSumma = new BigDecimal(value);
+      planOper.month_summa = new BigDecimal(value);
       return;
     }
     if ("prcSumma".equals(key) && planOper != null) {
-      planOper.prcSumma = new BigDecimal(value);
+      planOper.prc_summa = new BigDecimal(value);
       return;
     }
     if ("valuta".equals(key) && planOper != null) {
