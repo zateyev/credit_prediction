@@ -4,13 +4,11 @@ import kz.greetgo.credit_prediction.prepare_input_data.client_to_json.SelectorAs
 import kz.greetgo.credit_prediction.prepare_input_data.db.DbAccess;
 import kz.greetgo.credit_prediction.prepare_input_data.parser.ContractsRespParser;
 import kz.greetgo.credit_prediction.prepare_input_data.parser.OverduesRespParser;
+import kz.greetgo.credit_prediction.prepare_input_data.parser.ParserAbstract;
 import kz.greetgo.credit_prediction.prepare_input_data.parser.TransactionsRespParser;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -18,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MigrationController implements AutoCloseable {
 
@@ -25,9 +24,31 @@ public class MigrationController implements AutoCloseable {
   int maxBatchSize;
   private String pathToRawFiles;
 
+  private final AtomicBoolean working;
+  private final AtomicBoolean showStatus;
+
   public MigrationController(Connection connection, int maxBatchSize) {
     this.connection = connection;
     this.maxBatchSize = maxBatchSize;
+
+    working = new AtomicBoolean(true);
+    showStatus = new AtomicBoolean(false);
+    final Thread see = new Thread(() -> {
+
+      while (working.get()) {
+
+        try {
+          Thread.sleep(3000);
+        } catch (InterruptedException e) {
+          break;
+        }
+
+        showStatus.set(true);
+
+      }
+
+    });
+    see.start();
   }
 
   public static void main(String[] args) throws Exception {
@@ -37,60 +58,44 @@ public class MigrationController implements AutoCloseable {
       MigrationController mc = new MigrationController(connection, 10_000)
     ) {
 
-      mc.pathToRawFiles = "/home/zateyev/raw_data/";
+      mc.pathToRawFiles = "/home/zateyev/Gshare/credit_prediction/raw_data";
 
       mc.migrateToTmp();
       mc.deleteDuplicateRecords();
 
-      selectorAsJson.createClientJsonFiles("build/json_files/");
+      selectorAsJson.createClientJsonFiles("build/json_files");
     }
   }
 
   public void migrateToTmp() throws Exception {
-    List<String> contractFileDirs = getOverdueFiles(pathToRawFiles + "getContracts");
-    List<String> overdueFileDirs = getOverdueFiles(pathToRawFiles + "getOverdues");
-    List<String> transactionFileDirs = getOverdueFiles(pathToRawFiles + "getTransactions");
+    List<String> contractFileDirs = getLogFileDirs(pathToRawFiles + "/getContracts");
+    List<String> overdueFileDirs = getLogFileDirs(pathToRawFiles + "/getOverdues");
+    List<String> transactionFileDirs = getLogFileDirs(pathToRawFiles + "/getTransactions");
 
     try (
-      ContractsRespParser contractsRespParser = new ContractsRespParser(connection, maxBatchSize);
-      OverduesRespParser overduesRespParser = new OverduesRespParser(connection, maxBatchSize);
-      TransactionsRespParser transactionsRespParser = new TransactionsRespParser(connection, maxBatchSize)
+      ParserAbstract contractsRespParser = new ContractsRespParser(connection, maxBatchSize);
+      ParserAbstract overduesRespParser = new OverduesRespParser(connection, maxBatchSize);
+      ParserAbstract transactionsRespParser = new TransactionsRespParser(connection, maxBatchSize)
       ) {
 
-      for (String contractFileDir : contractFileDirs) {
-        Path path = Paths.get(contractFileDir);
-        FileInputStream fileInputStream = new FileInputStream(path.toFile());
-        contractsRespParser.read(fileInputStream);
-        System.out.println("File " + contractFileDir + " parsed");
-      }
+      uploadFromFiles(contractsRespParser, contractFileDirs);
+      uploadFromFiles(overduesRespParser, overdueFileDirs);
+      uploadFromFiles(transactionsRespParser, transactionFileDirs);
 
-      for (String overdueFileDir : overdueFileDirs) {
-        System.out.println("Reading file " + overdueFileDir);
-        Path path = Paths.get(overdueFileDir);
-        FileInputStream fileInputStream = new FileInputStream(path.toFile());
-        overduesRespParser.read(fileInputStream);
-      }
-
-      for (String transactionFileDir : transactionFileDirs) {
-        Path path = Paths.get(transactionFileDir);
-        FileInputStream fileInputStream = new FileInputStream(path.toFile());
-        transactionsRespParser.read(fileInputStream);
-        System.out.println("File " + transactionFileDir + " parsed");
-      }
     }
   }
 
-  private List<TarArchiveEntry> getContractFiles(String tarDir) throws IOException {
-    List<TarArchiveEntry> ret = new ArrayList<>();
-    TarArchiveInputStream tarInput = new TarArchiveInputStream(new FileInputStream(tarDir));
-    TarArchiveEntry entry;
-    while (null != (entry = tarInput.getNextTarEntry())) {
-      if (entry.getName().endsWith(".txt")) {
+  private void uploadFromFiles(ParserAbstract parser, List<String> contractFileDirs) throws Exception {
+    for (String contractFileDir : contractFileDirs) {
+      Path path = Paths.get(contractFileDir);
+      FileInputStream fileInputStream = new FileInputStream(path.toFile());
+      parser.read(fileInputStream);
 
-        ret.add(entry);
+      if (showStatus.get()) {
+        showStatus.set(false);
+        System.out.println("[Uploading File]: " + contractFileDir);
       }
     }
-    return ret;
   }
 
   private void deleteDuplicateRecords() throws SQLException {
@@ -134,7 +139,7 @@ public class MigrationController implements AutoCloseable {
     }
   }
 
-  private List<String> getOverdueFiles(String path) {
+  private List<String> getLogFileDirs(String path) {
     List<String> ret = new ArrayList<>();
 
     File folder = new File(path);
@@ -170,5 +175,6 @@ public class MigrationController implements AutoCloseable {
       connection.close();
       connection = null;
     }
+    working.set(false);
   }
 }

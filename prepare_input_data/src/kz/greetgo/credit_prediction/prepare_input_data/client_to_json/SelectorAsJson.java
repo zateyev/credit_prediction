@@ -10,13 +10,36 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SelectorAsJson implements AutoCloseable {
 
   public Connection connection;
 
+  private final AtomicBoolean working;
+  private final AtomicBoolean showStatus;
+
   public SelectorAsJson(Connection connection) {
     this.connection = connection;
+
+    working = new AtomicBoolean(true);
+    showStatus = new AtomicBoolean(false);
+    final Thread see = new Thread(() -> {
+
+      while (working.get()) {
+
+        try {
+          Thread.sleep(3000);
+        } catch (InterruptedException e) {
+          break;
+        }
+
+        showStatus.set(true);
+
+      }
+
+    });
+    see.start();
   }
 
   @SuppressWarnings("SameParameterValue")
@@ -43,16 +66,25 @@ public class SelectorAsJson implements AutoCloseable {
         int i = 0;
         PrintWriter writer;
         File file;
+
         while (resultSet.next()) {
-          file = new File(pathToSave + "client-" + i + ".json_row.txt");
+          file = new File(pathToSave + "/client-" + i + ".json_row.txt");
           //noinspection ResultOfMethodCallIgnored
           file.getParentFile().mkdirs();
           writer = new PrintWriter(file, "UTF-8");
           String json = resultSet.getString(1);
           writer.println(json);
           writer.close();
+
+          if (showStatus.get()) {
+            showStatus.set(false);
+            System.out.println("Creating files");
+          }
+
           i++;
         }
+
+        System.out.println("Created " + i + " files");
       }
     }
   }
@@ -63,5 +95,6 @@ public class SelectorAsJson implements AutoCloseable {
       connection.close();
       connection = null;
     }
+    working.set(false);
   }
 }
