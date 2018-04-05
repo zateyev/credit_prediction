@@ -16,7 +16,7 @@ public class ContractsRespParserTest {
       ContractsRespParser p = new ContractsRespParser(connection, 10_000)
       ) {
 
-      Path path = Paths.get("/home/zateyev/Gshare/credit_prediction/raw_data/getContracts/2018-03-23/05-00-27-3465963048.txt");
+      Path path = Paths.get("");
       FileInputStream fileInputStream = new FileInputStream(path.toFile());
       p.read(fileInputStream);
 
