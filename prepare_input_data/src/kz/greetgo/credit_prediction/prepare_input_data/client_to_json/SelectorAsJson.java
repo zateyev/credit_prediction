@@ -44,25 +44,35 @@ public class SelectorAsJson implements AutoCloseable {
 
   @SuppressWarnings("SameParameterValue")
   public void createClientJsonFiles(String pathToSave) throws SQLException, FileNotFoundException, UnsupportedEncodingException {
-    List<String> ret = new ArrayList<>();
     try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT to_json(t) FROM \n" +
-      " (select no, client_id, firstname, \n" +
+      " (select client_id, date_birth, firstname, surname, patronymic, inn, num_seria_passport, sex, type, fact_address, reg_address, type_passport, who_issue_passport,\n" +
       " \n" +
       "  (select array_to_json(array_agg(r)) FROM \n" +
-      "   (select *, \n" +
-      "    (select array_to_json(array_agg(po)) FROM (select * from plan_oper_tmp where contract_id = credit_tmp.contract_id) po) as plan_oper,\n" +
+      "   (select contract_id, branch, branch_code, contract_manager, contract_manager_ad_user, cred_line_id, depart_code, depart_name, \n" +
+      "           dog_summa, dog_summa_nt, grace_period, group_conv_num, kind_credit, method_calc_prc, name_group_client, num_dog, num_dog_cred_line, \n" +
+      "           pod_sector_cred, prc_rate, pre_payment_acc, product, rate_admin_prc, sector_cred, code_group_client, contract_manager_dep_code, stupen_cred, \n" +
+      "           sum_admin_prc, sum_admin_prc_nt, sum_cred_line, valuta, date_begin, date_end, date_open, \n" +
+      "           \n" +
+      "    (select array_to_json(array_agg(po)) FROM (select \n" +
+      "        cred_summa, debt_cred_balance, dog_summa, month_summa, prc_summa, valuta, plan_date\n" +
+      "     from plan_oper_tmp where contract_id = credit_tmp.contract_id) po) as plan_oper,\n" +
+      "    \n" +
       "    (select array_to_json(array_agg(ov)) FROM (select * from overdue where contract_id = credit_tmp.contract_id) ov) as overdue,\n" +
       "    (select array_to_json(array_agg(fo)) FROM (select * from fact_oper where contract_id = credit_tmp.contract_id) fo) as fact_oper,\n" +
       "    (select array_to_json(array_agg(am)) FROM (select * from acc_move where contract_id = credit_tmp.contract_id) am) as acc_move,\n" +
-      "    (select array_to_json(array_agg(co)) FROM (select * from collateral where contract_id = credit_tmp.contract_id) co) as acc_move\n" +
+      "    (select array_to_json(array_agg(co)) FROM (select * from collateral where contract_id = credit_tmp.contract_id) co) as collateral\n" +
       "   from credit_tmp where client_id = client_tmp.client_id) \n" +
       "  r) as credit,\n" +
       "  \n" +
-      "  (select array_to_json(array_agg(ph)) FROM (select * from phone_tmp where client_id = client_tmp.client_id) ph) as phone\n" +
-      " from client_tmp) t")) {
+      "  (select array_to_json(array_agg(ph)) FROM (select \n" +
+      "      phone_id, phone_num_status, phone_num_type, phone_numb\n" +
+      "   from phone_tmp where client_id = client_tmp.client_id) ph) as phone\n" +
+      " from client_tmp ORDER BY no) t")) {
 //      " from client_tmp LIMIT 15) t")) {
 
+      System.out.println("Selecting clients as json...");
       try (ResultSet resultSet = preparedStatement.executeQuery()) {
+        System.out.println("Started creating of files...");
         int i = 0;
         PrintWriter writer;
         File file;

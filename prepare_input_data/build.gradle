@@ -1,5 +1,7 @@
 
 dependencies {
+  compile "kz.greetgo.db:greetgo.db:$greetgoDbVersion"
+  compile "kz.greetgo:greetgo.conf:$greetgoConfVersion"
   compile group: 'org.postgresql', name: 'postgresql', version: '9.4-1202-jdbc42'
   compile group: 'org.apache.commons', name: 'commons-compress', version: '1.3'
 }

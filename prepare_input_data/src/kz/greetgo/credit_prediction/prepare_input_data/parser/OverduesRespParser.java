@@ -29,7 +29,7 @@ public class OverduesRespParser extends ParserAbstract {
       return;
     }
 
-    if (line.trim().startsWith("last_pay_date=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
+    if (line.trim().startsWith("lastPayDate=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
       lastPayDateCal = new GregorianCalendar();
       closeBracketList.add(() -> {
         if (lastPayDateCal == null) return;
@@ -39,7 +39,7 @@ public class OverduesRespParser extends ParserAbstract {
       return;
     }
 
-    if (line.trim().startsWith("date_prolongation=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
+    if (line.trim().startsWith("dateProlongation=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
       dateProlongationCal = new GregorianCalendar();
       closeBracketList.add(() -> {
         if (dateProlongationCal == null) return;

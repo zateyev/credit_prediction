@@ -43,6 +43,8 @@ subprojects {
 
   dependencies {
     ext.depinjectVersion = '2.0.0'
+    ext.greetgoDbVersion = '2.0.0'
+    ext.greetgoConfVersion = '0.1.5'
 
     testCompile 'org.testng:testng:6.5.1'
     compile 'org.easytesting:fest-assert-core:2.0M10'

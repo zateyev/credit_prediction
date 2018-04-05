@@ -58,11 +58,13 @@ public class MigrationController implements AutoCloseable {
       MigrationController mc = new MigrationController(connection, 10_000)
     ) {
 
+//      mc.pathToRawFiles = "/home/zateyev/credit_prediction/raw_data";
       mc.pathToRawFiles = "/home/zateyev/Gshare/credit_prediction/raw_data";
 
       mc.migrateToTmp();
       mc.deleteDuplicateRecords();
 
+//      selectorAsJson.createClientJsonFiles("/home/zateyev/credit_prediction/structured_json_files");
       selectorAsJson.createClientJsonFiles("build/json_files");
     }
   }
@@ -93,7 +95,7 @@ public class MigrationController implements AutoCloseable {
 
       if (showStatus.get()) {
         showStatus.set(false);
-        System.out.println("[Uploading File]: " + contractFileDir);
+        System.out.println("[Uploaded]: " + contractFileDir);
       }
     }
   }

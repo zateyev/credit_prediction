@@ -39,7 +39,7 @@ public class TransactionsRespParser extends ParserAbstract {
       return;
     }
 
-    if (line.trim().startsWith("oper_date=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
+    if (line.trim().startsWith("operDate=com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl@")) {
       if (factOper != null) {
         operDateCalF = new GregorianCalendar();
         closeBracketList.add(() -> {
@@ -190,10 +190,10 @@ public class TransactionsRespParser extends ParserAbstract {
 //      day = Integer.parseInt(value);
 //      return;
     }
-    if ("operDate".equals(key) && factOper != null) {
-      closeBracketList.add(() -> factOper.oper_date = readDate());
-      return;
-    }
+//    if ("operDate".equals(key) && factOper != null) {
+//      closeBracketList.add(() -> factOper.oper_date = readDate());
+//      return;
+//    }
 
     // read AccMove
     if ("accCorr".equals(key) && accMove != null) {
@@ -232,10 +232,10 @@ public class TransactionsRespParser extends ParserAbstract {
       accMove.open_balance_nt = new BigDecimal(value);
       return;
     }
-    if ("operDate".equals(key) && accMove != null) {
-      closeBracketList.add(() -> accMove.oper_date = readDate());
-      return;
-    }
+//    if ("operDate".equals(key) && accMove != null) {
+//      closeBracketList.add(() -> accMove.oper_date = readDate());
+//      return;
+//    }
     if ("turnCred".equals(key) && accMove != null) {
       accMove.turn_cred = new BigDecimal(value);
       return;
