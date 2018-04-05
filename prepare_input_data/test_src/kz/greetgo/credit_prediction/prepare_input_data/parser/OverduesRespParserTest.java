@@ -17,7 +17,7 @@ public class OverduesRespParserTest {
       ) {
 
 //      Path path = Paths.get("/home/zateyev/Gshare/credit_prediction/raw_data/getOverdues/05-34-04-2119601050.txt");
-      Path path = Paths.get("/home/zateyev/raw_data/getOverdues/2018-03-23/05-31-20-2460820870.txt");
+      Path path = Paths.get("/home/zateyev/Gshare/credit_prediction/raw_data/getOverdues/2018-03-23/05-31-20-2460820870.txt");
       FileInputStream fileInputStream = new FileInputStream(path.toFile());
       p.read(fileInputStream);
 

@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -58,27 +59,27 @@ public class MigrationController implements AutoCloseable {
       MigrationController mc = new MigrationController(connection, 10_000)
     ) {
 
-//      mc.pathToRawFiles = "/home/zateyev/credit_prediction/raw_data";
-      mc.pathToRawFiles = "/home/zateyev/Gshare/credit_prediction/raw_data";
+      mc.pathToRawFiles = "/home/zateyev/credit_prediction/raw_data";
+//      mc.pathToRawFiles = "/home/zateyev/Gshare/credit_prediction/raw_data";
 
       mc.migrateToTmp();
       mc.deleteDuplicateRecords();
 
-//      selectorAsJson.createClientJsonFiles("/home/zateyev/credit_prediction/structured_json_files");
-      selectorAsJson.createClientJsonFiles("build/json_files");
+      selectorAsJson.createClientJsonFiles("/home/zateyev/credit_prediction/structured_json_files");
+//      selectorAsJson.createClientJsonFiles("build/json_files");
     }
   }
 
   public void migrateToTmp() throws Exception {
-    List<String> contractFileDirs = getLogFileDirs(pathToRawFiles + "/getContracts");
-    List<String> overdueFileDirs = getLogFileDirs(pathToRawFiles + "/getOverdues");
-    List<String> transactionFileDirs = getLogFileDirs(pathToRawFiles + "/getTransactions");
+    List<String> contractFileDirs = getLogFileFolders(pathToRawFiles + "/getContracts");
+    List<String> overdueFileDirs = getLogFileFolders(pathToRawFiles + "/getOverdues");
+    List<String> transactionFileDirs = getLogFileFolders(pathToRawFiles + "/getTransactions");
 
     try (
       ParserAbstract contractsRespParser = new ContractsRespParser(connection, maxBatchSize);
       ParserAbstract overduesRespParser = new OverduesRespParser(connection, maxBatchSize);
       ParserAbstract transactionsRespParser = new TransactionsRespParser(connection, maxBatchSize)
-      ) {
+    ) {
 
       uploadFromFiles(contractsRespParser, contractFileDirs);
       uploadFromFiles(overduesRespParser, overdueFileDirs);
@@ -87,15 +88,21 @@ public class MigrationController implements AutoCloseable {
     }
   }
 
-  private void uploadFromFiles(ParserAbstract parser, List<String> contractFileDirs) throws Exception {
-    for (String contractFileDir : contractFileDirs) {
-      Path path = Paths.get(contractFileDir);
-      FileInputStream fileInputStream = new FileInputStream(path.toFile());
-      parser.read(fileInputStream);
+  private void uploadFromFiles(ParserAbstract parser, List<String> logFileFolders) throws Exception {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    for (String folder : logFileFolders) {
+      String[] split = folder.split("/");
+      parser.downloadDate = sdf.parse(split[split.length - 1]);
+      List<String> fileDirs = getLogFileDirs(folder);
+      for (String fileName : fileDirs) {
+        Path path = Paths.get(fileName);
+        FileInputStream fileInputStream = new FileInputStream(path.toFile());
+        parser.read(fileInputStream);
 
-      if (showStatus.get()) {
-        showStatus.set(false);
-        System.out.println("[Uploaded]: " + contractFileDir);
+        if (showStatus.get()) {
+          showStatus.set(false);
+          System.out.println("[Uploaded]: " + folder);
+        }
       }
     }
   }
@@ -142,33 +149,30 @@ public class MigrationController implements AutoCloseable {
   }
 
   private List<String> getLogFileDirs(String path) {
-    List<String> ret = new ArrayList<>();
+    File folder = new File(path);
+    List<String> fileDirs = new ArrayList<>();
+    //noinspection ConstantConditions
+    for (File file : folder.listFiles()) {
+      String name = file.getName();
+      fileDirs.add(path + "/" + name);
+    }
+    fileDirs.sort(String::compareTo);
 
+    return fileDirs;
+  }
+
+  private List<String> getLogFileFolders(String path) {
     File folder = new File(path);
     List<String> folders = new ArrayList<>();
     //noinspection ConstantConditions
     for (File folder1 : folder.listFiles()) {
-      String fileName = folder1.getName();
-      if (!fileName.endsWith(".tar")) {
-        folders.add(fileName);
+      String folder1Name = folder1.getName();
+      if (!folder1Name.endsWith(".tar")) {
+        folders.add(path + "/" + folder1Name);
       }
     }
     folders.sort(String::compareTo);
-    for (String s : folders) {
-      if (!s.endsWith(".tar")) {
-        folder = new File(path + "/" + s);
-        List<String> fileDirs = new ArrayList<>();
-        //noinspection ConstantConditions
-        for (File file : folder.listFiles()) {
-          String name = file.getName();
-          fileDirs.add(path + "/" + s + "/" + name);
-        }
-        fileDirs.sort(String::compareTo);
-        ret.addAll(fileDirs);
-      }
-    }
-
-    return ret;
+    return folders;
   }
 
   @Override

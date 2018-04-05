@@ -45,7 +45,8 @@ public class SelectorAsJson implements AutoCloseable {
   @SuppressWarnings("SameParameterValue")
   public void createClientJsonFiles(String pathToSave) throws SQLException, FileNotFoundException, UnsupportedEncodingException {
     try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT to_json(t) FROM \n" +
-      " (select client_id, date_birth, firstname, surname, patronymic, inn, num_seria_passport, sex, type, fact_address, reg_address, type_passport, who_issue_passport,\n" +
+      " (select client_id, date_birth, firstname, surname, patronymic, inn, num_seria_passport, sex, type, fact_address, reg_address, type_passport, who_issue_passport, \n" +
+      "         phys_work_place, jur_name, jur_registr, okved, phys_casta, workplace_spouse, \n" +
       " \n" +
       "  (select array_to_json(array_agg(r)) FROM \n" +
       "   (select contract_id, branch, branch_code, contract_manager, contract_manager_ad_user, cred_line_id, depart_code, depart_name, \n" +
@@ -78,7 +79,7 @@ public class SelectorAsJson implements AutoCloseable {
         File file;
 
         while (resultSet.next()) {
-          file = new File(pathToSave + "/client-" + i + ".json_row.txt");
+          file = new File(pathToSave + "/client-" + i + ".json");
           //noinspection ResultOfMethodCallIgnored
           file.getParentFile().mkdirs();
           writer = new PrintWriter(file, "UTF-8");

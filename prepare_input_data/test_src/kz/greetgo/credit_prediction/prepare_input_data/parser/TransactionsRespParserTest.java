@@ -17,7 +17,7 @@ public class TransactionsRespParserTest {
       TransactionsRespParser p = new TransactionsRespParser(connection, 10_000)
     ) {
 
-      Path path = Paths.get("/home/zateyev/Gshare/credit_prediction/raw_data/getTransactions/05-40-45-919867079.txt");
+      Path path = Paths.get("/home/zateyev/Gshare/credit_prediction/raw_data/getTransactions/2018-03-23/05-37-13-1842951975.txt");
       FileInputStream fileInputStream = new FileInputStream(path.toFile());
       p.read(fileInputStream);
 

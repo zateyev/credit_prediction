@@ -37,9 +37,9 @@ public class ContractsRespParser extends ParserAbstract {
 
     clientPS = connection.prepareStatement("insert into client_tmp (" +
       "no, client_id, date_birth, firstname, surname, patronymic, inn, num_seria_passport, sex, type, fact_address, reg_address, " +
-      "type_passport, who_issue_passport" +
+      "type_passport, who_issue_passport, phys_work_place, jur_name, jur_registr, okved, phys_casta, workplace_spouse" +
       ") values (" +
-      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
+      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
 
     creditPS = connection.prepareStatement("insert into credit_tmp (" +
@@ -88,7 +88,13 @@ public class ContractsRespParser extends ParserAbstract {
       "  fact_address varchar(300)," +
       "  reg_address varchar(300)," +
       "  type_passport varchar(30)," +
-      "  who_issue_passport varchar(300)" +
+      "  who_issue_passport varchar(300)," +
+      "  phys_work_place varchar(300)," +
+      "  jur_name varchar(300)," +
+      "  jur_registr varchar(300)," +
+      "  okved varchar(300)," +
+      "  phys_casta varchar(300)," +
+      "  workplace_spouse varchar(300)" +
       ")");
     DbAccess.createTable(connection, "create table credit_tmp (" +
       "  no         bigint primary key," +
@@ -187,7 +193,13 @@ public class ContractsRespParser extends ParserAbstract {
     clientPS.setString(ind++, client.fact_address);
     clientPS.setString(ind++, client.reg_address);
     clientPS.setString(ind++, client.type_passport);
-    clientPS.setString(ind, client.who_issue_passport);
+    clientPS.setString(ind++, client.who_issue_passport);
+    clientPS.setString(ind++, client.phys_work_place);
+    clientPS.setString(ind++, client.jur_name);
+    clientPS.setString(ind++, client.jur_registr);
+    clientPS.setString(ind++, client.okved);
+    clientPS.setString(ind++, client.phys_casta);
+    clientPS.setString(ind, client.workplace_spouse);
     clientPS.addBatch();
     clientBatchSize++;
 
@@ -531,6 +543,30 @@ public class ContractsRespParser extends ParserAbstract {
     }
     if ("whoIssuePassport".equals(key)) {
       client.who_issue_passport = value;
+      return;
+    }
+    if ("physWorkPlace".equals(key)) {
+      client.phys_work_place = value;
+      return;
+    }
+    if ("jurName".equals(key)) {
+      client.jur_name = value;
+      return;
+    }
+    if ("jurRegistr".equals(key)) {
+      client.jur_registr = value;
+      return;
+    }
+    if ("okved".equals(key)) {
+      client.okved = value;
+      return;
+    }
+    if ("physCasta".equals(key)) {
+      client.phys_casta = value;
+      return;
+    }
+    if ("workplaceSpouse".equals(key)) {
+      client.workplace_spouse = value;
       return;
     }
     if ("clientId".equals(key)) {

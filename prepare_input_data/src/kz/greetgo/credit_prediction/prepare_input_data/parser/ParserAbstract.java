@@ -14,6 +14,7 @@ public abstract class ParserAbstract implements AutoCloseable {
 
   protected int year, month, day;
   protected final List<CloseBracket> closeBracketList = new ArrayList<>();
+  public Date downloadDate;
 
   protected abstract void readLine(String line, int lineNo) throws SQLException;
   protected abstract void finish() throws SQLException;

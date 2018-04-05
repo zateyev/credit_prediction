@@ -31,31 +31,31 @@ public class Client {
   public String type_passport;
   public String who_issue_passport;
 
-  @Override
-  public String toString() {
-    return "Client{" +
-      "bic=" + bic +
-      ", bin=" + bin +
-      ", client_id='" + client_id + '\'' +
-      ", inn='" + inn + '\'' +
-      ", firstname='" + firstname + '\'' +
-      ", surname='" + surname + '\'' +
-      ", patronymic='" + patronymic + '\'' +
-      ", sex='" + sex + '\'' +
-      ", date_birth=" + date_birth +
-      ", type='" + type + '\'' +
-      ", fact_address='" + fact_address + '\'' +
-      ", reg_address='" + reg_address + '\'' +
-      ", jur_name='" + jur_name + '\'' +
-      ", jur_registr='" + jur_registr + '\'' +
-      ", num_seria_passport='" + num_seria_passport + '\'' +
-      ", okved='" + okved + '\'' +
-      ", phys_casta='" + phys_casta + '\'' +
-      ", phys_work_place='" + phys_work_place + '\'' +
-      ", workplace_spouse='" + workplace_spouse + '\'' +
-      ", date_issue_passport=" + date_issue_passport +
-      ", type_passport='" + type_passport + '\'' +
-      ", who_issue_passport='" + who_issue_passport + '\'' +
-      '}';
-  }
+//  @Override
+//  public String toString() {
+//    return "Client{" +
+//      "bic=" + bic +
+//      ", bin=" + bin +
+//      ", client_id='" + client_id + '\'' +
+//      ", inn='" + inn + '\'' +
+//      ", firstname='" + firstname + '\'' +
+//      ", surname='" + surname + '\'' +
+//      ", patronymic='" + patronymic + '\'' +
+//      ", sex='" + sex + '\'' +
+//      ", date_birth=" + date_birth +
+//      ", type='" + type + '\'' +
+//      ", fact_address='" + fact_address + '\'' +
+//      ", reg_address='" + reg_address + '\'' +
+//      ", jur_name='" + jur_name + '\'' +
+//      ", jur_registr='" + jur_registr + '\'' +
+//      ", num_seria_passport='" + num_seria_passport + '\'' +
+//      ", okved='" + okved + '\'' +
+//      ", phys_casta='" + phys_casta + '\'' +
+//      ", phys_work_place='" + phys_work_place + '\'' +
+//      ", workplace_spouse='" + workplace_spouse + '\'' +
+//      ", date_issue_passport=" + date_issue_passport +
+//      ", type_passport='" + type_passport + '\'' +
+//      ", who_issue_passport='" + who_issue_passport + '\'' +
+//      '}';
+//  }
 }

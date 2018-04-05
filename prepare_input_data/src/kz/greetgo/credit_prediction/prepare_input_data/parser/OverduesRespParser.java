@@ -216,9 +216,9 @@ public class OverduesRespParser extends ParserAbstract {
     overduePS = connection.prepareStatement("insert into overdue (" +
       "no, active_summa, active_summa_nt, calc_peny_debt, calc_peny_debt_nt, comment_from_cft, contract_id, cred_expert, cred_manager_ad_user," +
       " cred_manager_dep_code, date_prolongation, debt_all, debt_all_nt, debt_on_date, debt_on_date_nt, last_pay_date, overdue_day," +
-      " overdue_prc_debt, overdue_prc_debt_nt, plan_debt_on_date, plan_debt_on_date_nt, plan_prc_debt, plan_prc_debt_nt" +
+      " overdue_prc_debt, overdue_prc_debt_nt, plan_debt_on_date, plan_debt_on_date_nt, plan_prc_debt, plan_prc_debt_nt, download_date" +
       ") values (" +
-      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
+      " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
       ")");
   }
 
@@ -247,7 +247,8 @@ public class OverduesRespParser extends ParserAbstract {
       "   plan_debt_on_date decimal," +
       "   plan_debt_on_date_nt decimal," +
       "   plan_prc_debt decimal," +
-      "   plan_prc_debt_nt decimal" +
+      "   plan_prc_debt_nt decimal," +
+      "   download_date date" +
       ")");
   }
 
@@ -277,7 +278,8 @@ public class OverduesRespParser extends ParserAbstract {
     overduePS.setBigDecimal(ind++, overdue.plan_debt_on_date);
     overduePS.setBigDecimal(ind++, overdue.plan_debt_on_date_nt);
     overduePS.setBigDecimal(ind++, overdue.plan_prc_debt);
-    overduePS.setBigDecimal(ind, overdue.plan_prc_debt_nt);
+    overduePS.setBigDecimal(ind++, overdue.plan_prc_debt_nt);
+    overduePS.setObject(ind, toDate(downloadDate));
     overduePS.addBatch();
     overdueBatchSize++;
 
