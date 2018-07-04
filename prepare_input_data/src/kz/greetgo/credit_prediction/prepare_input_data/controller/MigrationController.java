@@ -60,14 +60,30 @@ public class MigrationController implements AutoCloseable {
     ) {
 
       mc.pathToRawFiles = "/home/zateyev/credit_prediction/raw_data";
-//      mc.pathToRawFiles = "/home/zateyev/Gshare/credit_prediction/raw_data";
+      mc.pathToRawFiles = "/home/zateyev/credit_prediction/humo";
 
       mc.migrateToTmp();
       mc.deleteDuplicateRecords();
 
-      selectorAsJson.createClientJsonFiles("/home/zateyev/credit_prediction/structured_json_files");
+      mc.createViews();
+
+      selectorAsJson.createClientJsonFiles("/home/zateyev/credit_prediction/humo_json");
 //      selectorAsJson.createClientJsonFiles("build/json_files");
     }
+  }
+
+  private void createViews() throws SQLException {
+    DbAccess.createTable(connection, "create view v_overdue as select array_to_json(array_agg(overdue))::text as json," +
+      " contract_id FROM overdue group by contract_id");
+
+    DbAccess.createTable(connection, "create view v_fact_oper as select array_to_json(array_agg(fact_oper))::text as json," +
+      " contract_id FROM fact_oper group by contract_id");
+
+    DbAccess.createTable(connection, "create view v_acc_move as select array_to_json(array_agg(acc_move))::text as json," +
+      " contract_id FROM acc_move group by contract_id");
+
+    DbAccess.createTable(connection, "create view v_collateral as select array_to_json(array_agg(collateral))::text as json," +
+      " contract_id FROM collateral group by contract_id");
   }
 
   public void migrateToTmp() throws Exception {
