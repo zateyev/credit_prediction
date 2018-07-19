@@ -81,7 +81,7 @@ public class SelectorAsJson implements AutoCloseable {
       "           pod_sector_cred, prc_rate, pre_payment_acc, product, rate_admin_prc, sector_cred, code_group_client, contract_manager_dep_code, stupen_cred, \n" +
       "           sum_admin_prc, sum_admin_prc_nt, sum_cred_line, valuta, date_begin, date_end, date_open, \n" +
       "    \n" +
-      "    (select array_to_json(array_agg(ov)) FROM (select no, active_summa, active_summa_nt, calc_peny_debt, calc_peny_debt_nt, comment_from_cft, contract_id, date_prolongation, debt_all, debt_all_nt, debt_on_date, debt_on_date_nt, last_pay_date, overdue_day, overdue_prc_debt, overdue_prc_debt_nt, plan_debt_on_date, plan_debt_on_date_nt, plan_prc_debt, plan_prc_debt_nt from overdue where contract_id = credit_tmp.contract_id) ov) as overdue,\n" +
+      "    (select array_to_json(array_agg(ov)) FROM (select no, active_summa, active_summa_nt, calc_peny_debt, calc_peny_debt_nt, comment_from_cft, contract_id, date_prolongation, debt_all, debt_all_nt, debt_on_date, debt_on_date_nt, last_pay_date, overdue_day, overdue_prc_debt, overdue_prc_debt_nt, plan_debt_on_date, plan_debt_on_date_nt, plan_prc_debt, plan_prc_debt_nt, download_date from overdue where contract_id = credit_tmp.contract_id) ov) as overdue,\n" +
       "    (select array_to_json(array_agg(co)) FROM (select * from collateral where contract_id = credit_tmp.contract_id) co) as collateral\n" +
       "   from credit_tmp where client_id = client_tmp.client_id) \n" +
       "  r) as credit\n" +
